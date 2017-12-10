@@ -1,0 +1,126 @@
+pre.lnjs {
+    background-color: #f5f5f5;
+    border: 1px solid #ccc;
+    padding: .5em;
+    border-radius: 4px;
+    box-shadow: 3px 3px 3px #777
+}
+
+pre,pre * {
+    -webkit-transition: .4s;
+    transition: .4s
+}
+
+pre .lnjs-toggle-btn {
+    position: absolute;
+    background-color: #eee;
+    opacity: 0;
+    padding: 2px;
+    border-radius: 25%;
+    top: .5em;
+    right: .5em
+}
+
+pre .lnjs-toggle-btn-touch {
+    opacity: .4
+}
+
+@media screen and (min-width:400px) {
+    pre:hover .lnjs-toggle-btn {
+        opacity: .8
+    }
+}
+
+pre .lnjs-toggle-btn::after {
+    content: "";
+    display: inline-block;
+    width: 25px;
+    height: 25px;
+    background: url(../img/numbered-list.svg) no-repeat;
+    background-size: contain
+}
+
+pre .lnjs-toggle-btn:hover {
+    -webkit-transition: initial;
+    transition: initial;
+    -webkit-transform: translate(-1px,-1px);
+    transform: translate(-1px,-1px);
+    box-shadow: 0 0 5px #fff
+}
+
+pre.lnjs code {
+    overflow-wrap: normal;
+    word-wrap: normal;
+    word-break: normal;
+    overflow-x: auto;
+    display: block;
+    counter-reset: linenumber;
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+    text-size-adjust: 100%
+}
+
+pre.lnjs code .lnjs-content {
+    margin-left: 2.8em
+}
+
+pre.lnjs code .lnjs-number {
+    position: absolute;
+    text-align: right;
+    width: 1.8em;
+    letter-spacing: 1px;
+    background-color: rgba(40,40,40,.4);
+    border-right: 1px solid #eee;
+    counter-increment: linenumber
+}
+
+pre.lnjs code .lnjs-number::before {
+    content: counter(linenumber);
+    text-align: right;
+    padding-right: .5em;
+    pointer-events: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none
+}
+
+pre.lnjs code.lnjs-under-hundred .lnjs-number {
+    width: 1.8em
+}
+
+pre.lnjs code.lnjs-under-hundred .lnjs-content {
+    margin-left: 2.8em
+}
+
+pre.lnjs code.lnjs-over-hundred .lnjs-number {
+    width: 2.5em
+}
+
+pre.lnjs code.lnjs-over-hundred .lnjs-content {
+    margin-left: 3.5em
+}
+
+pre.lnjs code.lnjs-over-thousand .lnjs-number {
+    width: 3em
+}
+
+pre.lnjs code.lnjs-over-thousand .lnjs-content {
+    margin-left: 4em
+}
+
+pre.lnjs .hard-wrap {
+    white-space: pre
+}
+
+pre.lnjs .soft-wrap {
+    white-space: pre-wrap
+}
+
+pre.lnjs code.soft-wrap .lnjs-row {
+    position: relative
+}
+
+pre.lnjs code.soft-wrap .lnjs-number {
+    height: 100%
+}
