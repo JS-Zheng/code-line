@@ -3,10 +3,11 @@ pre.lnjs {
     border: 1px solid #ccc;
     padding: .5em;
     border-radius: 4px;
-    box-shadow: 3px 3px 3px #777
+    -webkit-box-shadow: 3px 3px 3px #777;
+            box-shadow: 3px 3px 3px #777
 }
 
-pre, pre * {
+pre,pre * {
     -webkit-transition: .4s;
     transition: .4s
 }
@@ -25,7 +26,7 @@ pre .lnjs-toggle-btn-touch {
     opacity: .4
 }
 
-@media screen and (min-width: 400px) {
+@media screen and (min-width:400px) {
     pre:hover .lnjs-toggle-btn {
         opacity: .8
     }
@@ -43,9 +44,10 @@ pre .lnjs-toggle-btn::after {
 pre .lnjs-toggle-btn:hover {
     -webkit-transition: initial;
     transition: initial;
-    -webkit-transform: translate(-1px, -1px);
-    transform: translate(-1px, -1px);
-    box-shadow: 0 0 5px #fff
+    -webkit-transform: translate(-1px,-1px);
+    transform: translate(-1px,-1px);
+    -webkit-box-shadow: 0 0 5px #fff;
+            box-shadow: 0 0 5px #fff
 }
 
 pre.lnjs code {
@@ -57,7 +59,8 @@ pre.lnjs code {
     counter-reset: linenumber;
     -webkit-text-size-adjust: 100%;
     -ms-text-size-adjust: 100%;
-    text-size-adjust: 100%
+    -moz-text-size-adjust: 100%;
+         text-size-adjust: 100%
 }
 
 pre.lnjs code .lnjs-content {
@@ -69,7 +72,7 @@ pre.lnjs code .lnjs-number {
     text-align: right;
     width: 1.8em;
     letter-spacing: 1px;
-    background-color: rgba(40, 40, 40, .4);
+    background-color: rgba(40,40,40,.4);
     border-right: 1px solid #eee;
     counter-increment: linenumber
 }

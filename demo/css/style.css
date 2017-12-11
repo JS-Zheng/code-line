@@ -9,7 +9,8 @@ pre.lnjs {
     border: 1px solid #ccc;
     padding: .5em;
     border-radius: 4px;
-    box-shadow: 3px 3px 3px #777
+    -webkit-box-shadow: 3px 3px 3px #777;
+            box-shadow: 3px 3px 3px #777
 }
 
 pre,pre * {
@@ -23,8 +24,8 @@ pre .lnjs-toggle-btn {
     opacity: 0;
     padding: 2px;
     border-radius: 25%;
-    top: .5em;
-    right: .5em
+    top: .6em;
+    right: .6em
 }
 
 pre .lnjs-toggle-btn-touch {
@@ -42,7 +43,7 @@ pre .lnjs-toggle-btn::after {
     display: inline-block;
     width: 25px;
     height: 25px;
-    background: url(https://jasonnn331.github.io/line-numbers.js/demo/img/numbered-list.svg) no-repeat;
+    background: url(../img/numbered-list.svg) no-repeat;
     background-size: contain
 }
 
@@ -51,7 +52,8 @@ pre .lnjs-toggle-btn:hover {
     transition: initial;
     -webkit-transform: translate(-1px,-1px);
     transform: translate(-1px,-1px);
-    box-shadow: 0 0 5px #fff
+    -webkit-box-shadow: 0 0 5px #fff;
+            box-shadow: 0 0 5px #fff
 }
 
 pre.lnjs code {
@@ -63,7 +65,8 @@ pre.lnjs code {
     counter-reset: linenumber;
     -webkit-text-size-adjust: 100%;
     -ms-text-size-adjust: 100%;
-    text-size-adjust: 100%
+    -moz-text-size-adjust: 100%;
+         text-size-adjust: 100%
 }
 
 pre.lnjs code .lnjs-content {
