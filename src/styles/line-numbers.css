@@ -6,7 +6,7 @@ pre.lnjs {
     box-shadow: 3px 3px 3px #777
 }
 
-pre,pre * {
+pre, pre * {
     -webkit-transition: .4s;
     transition: .4s
 }
@@ -17,15 +17,15 @@ pre .lnjs-toggle-btn {
     opacity: 0;
     padding: 2px;
     border-radius: 25%;
-    top: .5em;
-    right: .5em
+    top: .6em;
+    right: .6em
 }
 
 pre .lnjs-toggle-btn-touch {
     opacity: .4
 }
 
-@media screen and (min-width:400px) {
+@media screen and (min-width: 400px) {
     pre:hover .lnjs-toggle-btn {
         opacity: .8
     }
@@ -43,8 +43,8 @@ pre .lnjs-toggle-btn::after {
 pre .lnjs-toggle-btn:hover {
     -webkit-transition: initial;
     transition: initial;
-    -webkit-transform: translate(-1px,-1px);
-    transform: translate(-1px,-1px);
+    -webkit-transform: translate(-1px, -1px);
+    transform: translate(-1px, -1px);
     box-shadow: 0 0 5px #fff
 }
 
@@ -69,7 +69,7 @@ pre.lnjs code .lnjs-number {
     text-align: right;
     width: 1.8em;
     letter-spacing: 1px;
-    background-color: rgba(40,40,40,.4);
+    background-color: rgba(40, 40, 40, .4);
     border-right: 1px solid #eee;
     counter-increment: linenumber
 }

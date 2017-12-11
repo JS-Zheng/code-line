@@ -2,7 +2,7 @@ var lineNums = (() => {
 
   const classPrefix = 'lnjs';
 
-  return new function () {
+  function LineNumbers() {
     const self = this;
     this.lineHeight = 1.5;
     this.softWrap = false;
@@ -33,7 +33,9 @@ var lineNums = (() => {
         setWrapClz(self.softWrap, code);
       });
     };
-  };
+  }
+
+  return new LineNumbers();
 
   function checkPositionOfPre(pre) {
     if (!pre) return;
