@@ -1,10 +1,10 @@
-# Line-numbers.js
+# Code-Line.js
 
-Line-numbers.js is a lightweight plugin, it finds every `<pre><code>...` in your page, and append line numbers. Most of the features are dependent on CSS to complete, so very flexible & efficient.
+Code-line.js is a lightweight plugin, it finds every `<pre><code>...` in your page, and append line numbers. Most of the features are dependent on CSS to complete, so very flexible & efficient.
 
 It's mainly use with [Highlight.js](https://github.com/isagalaev/highlight.js), but you can also render your code in any way.  
 
-[GitHub Pages](https://jasonnn331.github.io/line-numbers.js/)
+[GitHub Pages](https://js-zheng.github.io/code-line/)
 
 ---
 
@@ -16,7 +16,25 @@ Let's demonstrate a "Hello, World!" to you.
 
 ![java-hello-world](demo/java-hello-world.png) 
 
-If you like, keep looking down 😆 or see more [Example](https://jasonnn331.github.io/line-numbers.js/demo/).
+If you like, keep looking down 😆 or see more [Example](https://js-zheng.github.io/code-line/demo/).
+
+
+---
+
+## Install
+
+Code-line doesn't rely on any module, just load it!
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/code-line"></script>
+```
+
+or use npm:
+
+```
+npm install code-line
+```
+
 
 ---
 
@@ -25,31 +43,28 @@ If you like, keep looking down 😆 or see more [Example](https://jasonnn331.git
 The only thing you need to do is:
 
 ```html
-<link rel="stylesheet" href="/path/to/styles/line-numbers.min.css">
-<script src="/path/to/line-numbers.min.js"></script>
-<script>lineNums.loadLineNumbers();</script>
+<script>CodeLine.initOnPageLoad()</script>
 ```  
 
 ### Choose the loading time
-If you want to ensure that initialize line-numbers after page load, just use `addEventListener`.  
-Of course, you can use the utils directly, like [whenReady.js](src/whenReady.js) which is written by David Flanagan.  
-  
+If you want to customize the loading time:
+
 EX:
-```html
-<script src="/path/to/whenReady.js"></script>
-<script>whenReady(lineNums.loadLineNumbers);</script>
+```javascript
+// May be event-triggered or below the html body
+CodeLine.loadLineNumbers()
 ```
 
 ### Nohighlight
 
 Same as the [Highlight.js](https://github.com/isagalaev/highlight.js).  
-To disable line-number altogether use the nohighlight class:
+To disable code-line altogether use the nohighlight class:
 
 ```html
 <pre><code class="nohighlight">...</code></pre>
 ```
 
-### Absolute Number
+### Absolute Position
 
 We usually have to trace codes with mobile devices. 
 
@@ -71,7 +86,7 @@ pre.line-numbers code {
 
 ### Soft Wrap
 
-`Hard Wrap` is the default setting of Line-numbers.js.  
+`Hard Wrap` is the default setting of Code-line.
 If you want to use `Soft Wrap`, append `soft-wrap` class to your `<code>`:  
 
 ```html

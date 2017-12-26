@@ -1,21 +1,25 @@
-var lineNums = (() => {
+import numberIcon from './img/numbered-list.svg'
+import './styles/code-line.css'
+import whenReady from './whenReady'
 
-  const classPrefix = 'lnjs';
+export default (() => {
+
+  const classPrefix = 'cljs';
 
   function LineNumbers() {
     const self = this;
-    this.lineHeight = 1.5;
+    this.lineHeight = 1.3;
     this.softWrap = false;
     this.showToggleBtn = true;
-    this.defaultDisableMobile = true;
-    this.defaultMaxMobileWidth = 420;
+    this.disableOnMobile = true;
+    this.maxMobileWidth = 420;
 
     this.loadLineNumbers = function () {
       const codes = document.querySelectorAll("pre code");
 
       [].forEach.call(codes, code => {
 
-        if (code.matches(".nohighlight")) return;
+        if (code.parentNode.matches(".nohighlight") || code.matches(".nohighlight")) return;
 
         let lines = getLines(code);
         if (!lines || lines.length < 3) return;
@@ -26,13 +30,18 @@ var lineNums = (() => {
 
         splitCodeLayout(code, lines);
 
-        setLineNumbersClz(self.defaultMaxMobileWidth, self.defaultDisableMobile, code);
+        setLineNumbersClz(self.maxMobileWidth, self.disableOnMobile, code);
 
-        showToggleButton(self.showToggleBtn, code);
+        if (self.showToggleBtn)
+          showToggleButton(self.showToggleBtn, code);
 
         setWrapClz(self.softWrap, code);
       });
     };
+
+    this.initOnPageLoad = function () {
+      whenReady(this.loadLineNumbers);
+    }
   }
 
   return new LineNumbers();
