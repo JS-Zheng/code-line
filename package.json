@@ -1,9 +1,9 @@
 {
   "name": "code-line",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Let your code have line numbers.",
   "main": "./dist/code-line.js",
-  "module": "./src/code-line.js",
+  "module": "./dist/code-line.esm.js",
   "scripts": {
     "dev": "webpack --config build/webpack.dev.js",
     "build": "webpack --config build/webpack.prod.js"
