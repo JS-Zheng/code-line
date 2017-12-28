@@ -15,11 +15,10 @@ export default (() => {
     this.disableOnMobile = true;
     this.maxMobileWidth = 420;
 
-
     this.loadLineNumbers = function () {
       let codes = document.querySelectorAll("pre code");
 
-      codes.forEach(code => {
+      Array.from(codes).forEach(code => {
         if (code.parentNode.matches(".nohighlight") || code.matches(".nohighlight")) return;
 
         let lines = getLines(code);
