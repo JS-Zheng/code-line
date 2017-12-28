@@ -45,7 +45,7 @@ pre.cljs code {
   word-break: normal;
   overflow-x: auto;
   display: block;
-  --cljs-code-line-height: 1.35;
+  --cljs-code-line-height: 1.4;
   line-height: var(--cljs-code-line-height);
   padding-left: 0;
   counter-reset: linenumber;
@@ -92,8 +92,12 @@ pre.cljs .cljs-number::before {
   user-select: none
 }
 
+pre.cljs .cljs-row * {
+  box-sizing: content-box
+}
+
 pre.cljs code.cljs-under-hundred .cljs-number {
-  width: 2em
+  width: 2.1em
 }
 
 pre.cljs code.cljs-under-hundred .cljs-content {
@@ -101,7 +105,7 @@ pre.cljs code.cljs-under-hundred .cljs-content {
 }
 
 pre.cljs code.cljs-over-hundred .cljs-number {
-  width: 2.5em
+  width: 2.6em
 }
 
 pre.cljs code.cljs-over-hundred .cljs-content {
@@ -109,7 +113,7 @@ pre.cljs code.cljs-over-hundred .cljs-content {
 }
 
 pre.cljs code.cljs-over-thousand .cljs-number {
-  width: 3em
+  width: 3.1em
 }
 
 pre.cljs code.cljs-over-thousand .cljs-content {

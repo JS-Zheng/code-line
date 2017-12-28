@@ -1,6 +1,6 @@
 {
   "name": "code-line",
-  "version": "1.0.4",
+  "version": "1.0.5-rc.2",
   "description": "Let your code have line numbers.",
   "main": "./dist/code-line.js",
   "module": "./dist/code-line.esm.js",
