@@ -6,27 +6,26 @@ export default (() => {
 
   const classPrefix = 'cljs';
 
-  function LineNumbers() {
+  function CodeLine() {
     const self = this;
-    this.lineHeight = 1.3;
+
+    this.minLies = 3;
     this.softWrap = false;
     this.showToggleBtn = true;
     this.disableOnMobile = true;
     this.maxMobileWidth = 420;
 
+
     this.loadLineNumbers = function () {
-      const codes = document.querySelectorAll("pre code");
+      let codes = document.querySelectorAll("pre code");
 
-      [].forEach.call(codes, code => {
-
+      codes.forEach(code => {
         if (code.parentNode.matches(".nohighlight") || code.matches(".nohighlight")) return;
 
         let lines = getLines(code);
-        if (!lines || lines.length < 3) return;
+        if (!lines || lines.length < self.minLies) return;
 
         checkPositionOfPre(code.parentNode);
-
-        checkLineHeight(self.lineHeight, code);
 
         splitCodeLayout(code, lines);
 
@@ -37,6 +36,9 @@ export default (() => {
 
         setWrapClz(self.softWrap, code);
       });
+
+      setTimeout(addNumsListener, 0);
+
     };
 
     this.initOnPageLoad = function () {
@@ -44,7 +46,7 @@ export default (() => {
     }
   }
 
-  return new LineNumbers();
+  return new CodeLine();
 
   function checkPositionOfPre(pre) {
     if (!pre) return;
@@ -57,31 +59,25 @@ export default (() => {
       pre.style.position = "relative";
   }
 
-  function checkLineHeight(lineHeight, code) {
-    const customLineHeight = code.style.lineHeight;
-
-    if (!customLineHeight || 0 === customLineHeight.length) {
-      code.style.lineHeight = lineHeight;
-    }
-  }
-
   function splitCodeLayout(code, lines) {
     const fragment = document.createDocumentFragment();
     const linesLength = lines.length;
+    const container = buildElement("div", "container");
 
-    [].forEach.call(lines, line => {
+    setCodeLength(linesLength, code);
 
+    Array.from(lines).forEach(line => {
       const row = buildElement("div", "row");
       const num = buildElement("div", "number");
       const codeContent = buildElement("div", "content");
       codeContent.innerHTML = line + "\n";
 
-      setCodeLength(linesLength, code);
-
       row.appendChild(num);
       row.appendChild(codeContent);
-      fragment.appendChild(row);
+      container.appendChild(row);
     });
+
+    fragment.appendChild(container);
 
     code.innerHTML = "";
     code.appendChild(fragment);
@@ -136,6 +132,19 @@ export default (() => {
     if (!code.classList.contains("soft-wrap")
       && !code.classList.contains("soft-wrap"))
       code.classList.add(wrap ? "soft-wrap" : "hard-wrap");
+  }
+
+  function addNumsListener() {
+    let numClz = '.' + classPrefix + '-' + 'number';
+    let nums = document.querySelectorAll(numClz);
+
+    Array.from(nums).forEach(n => {
+      n.addEventListener('click', e => {
+        let content = e.target.nextSibling;
+        if (!content) return;
+        content.classList.toggle('cljs-row-highlight')
+      });
+    });
   }
 
   function getDeviceWidth() {

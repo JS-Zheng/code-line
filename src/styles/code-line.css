@@ -1,11 +1,11 @@
-pre, pre * {
+pre,pre * {
   -webkit-transition: .4s;
   transition: .4s
 }
 
 pre .cljs-toggle-btn {
   position: absolute;
-  background-color: #eee;
+  background-color: #fff;
   opacity: 0;
   padding: 2px;
   border-radius: 25%;
@@ -17,9 +17,9 @@ pre .cljs-toggle-btn-touch {
   opacity: .4
 }
 
-@media screen and (min-width: 400px) {
+@media screen and (min-width:400px) {
   pre:hover .cljs-toggle-btn {
-    opacity: .8
+    opacity: .5
   }
 }
 
@@ -35,8 +35,8 @@ pre .cljs-toggle-btn::after {
 pre .cljs-toggle-btn:hover {
   -webkit-transition: initial;
   transition: initial;
-  -webkit-transform: translate(-1px, -1px);
-  transform: translate(-1px, -1px);
+  -webkit-transform: translate(-1px,-1px);
+  transform: translate(-1px,-1px)
 }
 
 pre.cljs code {
@@ -45,6 +45,9 @@ pre.cljs code {
   word-break: normal;
   overflow-x: auto;
   display: block;
+  --cljs-code-line-height: 1.35;
+  line-height: var(--cljs-code-line-height);
+  padding-left: 0;
   counter-reset: linenumber;
   -webkit-text-size-adjust: 100%;
   -ms-text-size-adjust: 100%;
@@ -52,21 +55,33 @@ pre.cljs code {
   text-size-adjust: 100%
 }
 
-pre.cljs code .cljs-content {
-  margin-left: 2.8em
+.cljs-container {
+  display: inline-block;
+  min-width: 100%
 }
 
-pre.cljs code .cljs-number {
+.cljs-container,.cljs-row {
+  background: inherit
+}
+
+pre.cljs .cljs-row-highlight {
+  background-color: #ef9a9a;
+  color: #fff
+}
+
+pre.cljs .cljs-number {
   position: absolute;
   text-align: right;
-  width: 1.8em;
   letter-spacing: 1px;
-  /*background-color: rgba(40, 40, 40, .4);*/
-  border-right: 1px solid #eee;
-  counter-increment: linenumber
+  background: inherit;
+  padding-left: .3em;
+  opacity: .9;
+  border-right: 1px solid #ddd;
+  counter-increment: linenumber;
+  line-height: calc(var(--cljs-code-line-height, 1.35) + .1)
 }
 
-pre.cljs code .cljs-number::before {
+pre.cljs .cljs-number::before {
   content: counter(linenumber);
   text-align: right;
   padding-right: .5em;
@@ -78,11 +93,11 @@ pre.cljs code .cljs-number::before {
 }
 
 pre.cljs code.cljs-under-hundred .cljs-number {
-  width: 1.8em
+  width: 2em
 }
 
 pre.cljs code.cljs-under-hundred .cljs-content {
-  margin-left: 2.8em
+  margin-left: 3.2em
 }
 
 pre.cljs code.cljs-over-hundred .cljs-number {
@@ -90,7 +105,7 @@ pre.cljs code.cljs-over-hundred .cljs-number {
 }
 
 pre.cljs code.cljs-over-hundred .cljs-content {
-  margin-left: 3.5em
+  margin-left: 3.7em
 }
 
 pre.cljs code.cljs-over-thousand .cljs-number {
@@ -98,7 +113,7 @@ pre.cljs code.cljs-over-thousand .cljs-number {
 }
 
 pre.cljs code.cljs-over-thousand .cljs-content {
-  margin-left: 4em
+  margin-left: 4.2em
 }
 
 pre.cljs .hard-wrap {
