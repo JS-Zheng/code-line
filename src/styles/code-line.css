@@ -1,4 +1,4 @@
-pre,pre * {
+pre, pre * {
   -webkit-transition: .4s;
   transition: .4s
 }
@@ -13,14 +13,8 @@ pre .cljs-toggle-btn {
   right: .6em
 }
 
-pre .cljs-toggle-btn-touch {
-  opacity: .4
-}
-
-@media screen and (min-width:400px) {
-  pre:hover .cljs-toggle-btn {
-    opacity: .5
-  }
+pre .cljs-toggle-btn-enabled {
+  opacity: .5
 }
 
 pre .cljs-toggle-btn::after {
@@ -35,8 +29,8 @@ pre .cljs-toggle-btn::after {
 pre .cljs-toggle-btn:hover {
   -webkit-transition: initial;
   transition: initial;
-  -webkit-transform: translate(-1px,-1px);
-  transform: translate(-1px,-1px)
+  -webkit-transform: translate(-1px, -1px);
+  transform: translate(-1px, -1px)
 }
 
 pre.cljs code {
@@ -45,7 +39,7 @@ pre.cljs code {
   word-break: normal;
   overflow-x: auto;
   display: block;
-  --cljs-code-line-height: 1.4;
+  --cljs-code-line-height: 1.45;
   line-height: var(--cljs-code-line-height);
   padding-left: 0;
   counter-reset: linenumber;
@@ -60,7 +54,7 @@ pre.cljs code {
   min-width: 100%
 }
 
-.cljs-container,.cljs-row {
+.cljs-container, .cljs-row {
   background: inherit
 }
 

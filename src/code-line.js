@@ -17,6 +17,7 @@ export default (() => {
 
     this.loadLineNumbers = function () {
       let codes = document.querySelectorAll("pre code");
+      const deviceWidth = getDeviceWidth();
 
       Array.from(codes).forEach(code => {
         if (code.parentNode.matches(".nohighlight") || code.matches(".nohighlight")) return;
@@ -24,11 +25,12 @@ export default (() => {
         let lines = getLines(code);
         if (!lines || lines.length < self.minLies) return;
 
+        if (deviceWidth > self.maxMobileWidth || !self.disableOnMobile)
+          code.parentNode.classList.add(classPrefix);
+
         checkPositionOfPre(code.parentNode);
 
         splitCodeLayout(code, lines);
-
-        setLineNumbersClz(self.maxMobileWidth, self.disableOnMobile, code);
 
         if (self.showToggleBtn)
           showToggleButton(self.showToggleBtn, code);
@@ -37,7 +39,6 @@ export default (() => {
       });
 
       setTimeout(addNumsListener, 0);
-
     };
 
     this.initOnPageLoad = function () {
@@ -83,11 +84,6 @@ export default (() => {
   }
 
 
-  function setLineNumbersClz(mobileWidth, disableMobile, code) {
-    if (getDeviceWidth() > mobileWidth || !disableMobile)
-      code.parentNode.classList.add(classPrefix);
-  }
-
   function showToggleButton(showBtn, code) {
     if (!showBtn) return;
 
@@ -98,11 +94,22 @@ export default (() => {
     addPrefixClzToElement(div, "toggle-btn");
     div.addEventListener("click", () => pre.classList.toggle(classPrefix));
 
-    const toggleBtnTouchClz = getPrefixClzName("toggle-btn-touch");
+    const toggleBtnTouchClz = getPrefixClzName("toggle-btn-enabled");
     let counter = 2;
     let intervalId;
-    pre.addEventListener("touchend", () => {
+
+    pre.addEventListener("touchstart", startEvent);
+    pre.addEventListener("touchend", endEvent);
+
+    pre.addEventListener("mouseenter", startEvent);
+    pre.addEventListener("mouseleave", endEvent);
+
+    pre.appendChild(div);
+
+    function endEvent(e) {
       if (intervalId) return;
+
+      let cancelTime = /mouse.*$/i.test(e.type) ? 0 : 1000;
 
       intervalId = setInterval(() => {
         if (--counter <= 0) {
@@ -110,10 +117,10 @@ export default (() => {
           clearInterval(intervalId);
           intervalId = null;
         }
-      }, 1000);
-    });
+      }, cancelTime);
+    }
 
-    pre.addEventListener("touchstart", () => {
+    function startEvent() {
       counter = 2;
 
       if (intervalId) {
@@ -122,9 +129,7 @@ export default (() => {
       }
 
       div.classList.add(toggleBtnTouchClz);
-    });
-
-    pre.appendChild(div);
+    }
   }
 
   function setWrapClz(wrap, code) {
@@ -136,12 +141,13 @@ export default (() => {
   function addNumsListener() {
     let numClz = '.' + classPrefix + '-' + 'number';
     let nums = document.querySelectorAll(numClz);
+    let highlightClz = classPrefix + '-' + 'row-highlight';
 
     Array.from(nums).forEach(n => {
       n.addEventListener('click', e => {
         let content = e.target.nextSibling;
         if (!content) return;
-        content.classList.toggle('cljs-row-highlight')
+        content.classList.toggle(highlightClz)
       });
     });
   }
@@ -149,7 +155,6 @@ export default (() => {
   function getDeviceWidth() {
     return window.innerWidth > 0 ? window.innerWidth : screen.width;
   }
-
 
   function getLines(code) {
     const text = code.innerHTML;
