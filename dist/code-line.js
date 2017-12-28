@@ -1,5 +1,5 @@
 /*!
- * code-line v1.0.3-rc.1
+ * code-line v1.0.3
  * (c) 2017 Jason Zheng
  * Released under the MIT License.
  */
