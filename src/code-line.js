@@ -5,6 +5,8 @@ import whenReady from './whenReady'
 export default (() => {
 
   const classPrefix = 'cljs';
+  const numClickEventName = '$_' + classPrefix + 'NumClickEvent';
+  let elementProto = {};
 
   function CodeLine() {
     const self = this;
@@ -15,30 +17,46 @@ export default (() => {
     this.disableOnMobile = true;
     this.maxMobileWidth = 420;
 
+
     this.loadLineNumbers = function () {
       let codes = document.querySelectorAll("pre code");
       const deviceWidth = getDeviceWidth();
 
-      Array.from(codes).forEach(code => {
-        if (code.parentNode.matches(".nohighlight") || code.matches(".nohighlight")) return;
+      // for Performance is faster than Array#forEach:
+      for (let i = 0, code; code = codes[i]; i++) {
+        const pre = code.parentNode;
+
+        if (pre.matches(".nohighlight") || code.matches(".nohighlight")) continue;
 
         let lines = getLines(code);
-        if (!lines || lines.length < self.minLies) return;
+        if (!lines || lines.length < self.minLies) continue;
 
         if (deviceWidth > self.maxMobileWidth || !self.disableOnMobile)
-          code.parentNode.classList.add(classPrefix);
-
-        checkPositionOfPre(code.parentNode);
+          pre.classList.add(classPrefix);
 
         splitCodeLayout(code, lines);
 
         if (self.showToggleBtn)
-          showToggleButton(self.showToggleBtn, code);
+          appendToggleButton(pre, code);
 
-        setWrapClz(self.softWrap, code);
-      });
+        if (self.softWrap)
+          toggleSoftWrap(code);
+      } // for End
 
-      setTimeout(addNumsListener, 0);
+      // free cache
+      elementProto = {};
+
+      setGlobalNumClickEvent();
+
+      function setGlobalNumClickEvent() {
+        let highlightClz = classPrefix + '-' + 'row-highlight';
+        window[numClickEventName] = function (e) {
+          let content = e.target.nextSibling;
+          if (!content) return;
+          content.classList.toggle(highlightClz)
+        };
+      }
+
     };
 
     this.initOnPageLoad = function () {
@@ -48,79 +66,94 @@ export default (() => {
 
   return new CodeLine();
 
-  function checkPositionOfPre(pre) {
-    if (!pre) return;
+  function getDeviceWidth() {
+    const wWidth = window.innerWidth;
+    return wWidth > 0 ? wWidth : screen.width;
+  }
 
-    let originalPosition = pre.style.position;
-    if (!originalPosition)
-      originalPosition = window.getComputedStyle(pre).getPropertyValue("position");
-
-    if (!originalPosition || /^static$/i.test(originalPosition))
-      pre.style.position = "relative";
+  function getLines(code) {
+    const text = code.innerHTML;
+    return !text.length ? [] : text.split(/\r?\n|\r/g);
   }
 
   function splitCodeLayout(code, lines) {
-    const fragment = document.createDocumentFragment();
     const linesLength = lines.length;
-    const container = buildElement("div", "container");
+
+    const container = createElementWithClz("div", "container");
 
     setCodeLength(linesLength, code);
 
-    Array.from(lines).forEach(line => {
-      const row = buildElement("div", "row");
-      const num = buildElement("div", "number");
-      const codeContent = buildElement("div", "content");
-      codeContent.innerHTML = line + "\n";
+    const rowProto = createRowPrototype();
+    const contentClz = getPrefixClzName('content');
 
-      row.appendChild(num);
-      row.appendChild(codeContent);
+    for (let i = 0, line; (line = lines[i] ) || line === ''; i++) {
+      const row = rowProto.cloneNode(true);
+
+      if (line !== '') {
+        // getElementsByClassName is faster than querySelector
+        const codeContent = row.getElementsByClassName(contentClz)[0];
+        codeContent.innerHTML = line + '\n';
+      }
+
       container.appendChild(row);
-    });
-
-    fragment.appendChild(container);
+    }
 
     code.innerHTML = "";
-    code.appendChild(fragment);
+    code.appendChild(container);
+
+    function createRowPrototype() {
+      // use inline event attribute instead of addEventListener
+      // to prevent DOM manipulating (e.g., Node Replace) by other script.
+      const key = 'rowPrototype';
+      let cache = elementProto[key];
+
+      if (cache)
+        return cache;
+
+      const row = createElementWithClz('div', 'row');
+      const num = createElementWithClz('div', 'number');
+      const codeContent = createElementWithClz("div", "content");
+      codeContent.innerHTML = '\n';
+      num.setAttribute('onclick', `${numClickEventName}(event)`);
+      row.appendChild(num);
+      row.appendChild(codeContent);
+
+      elementProto[key] = row;
+
+      return row;
+    }
   }
 
+  function appendToggleButton(pre, code) {
+    // appendCodeWrapper
+    const codeWrapper = createElementWithClz("div", "wrapper");
+    pre.appendChild(codeWrapper);
+    codeWrapper.appendChild(code);
 
-  function showToggleButton(showBtn, code) {
-    if (!showBtn) return;
-
-    const pre = code.parentNode;
-    if (!pre) return;
-
-    const div = document.createElement("div");
-    addPrefixClzToElement(div, "toggle-btn");
-    div.addEventListener("click", () => pre.classList.toggle(classPrefix));
+    // appendToggleBtn
+    let btn = createElementWithClz('div', 'toggle-btn');
+    btn.addEventListener("click", () => pre.classList.toggle(classPrefix));
 
     const toggleBtnTouchClz = getPrefixClzName("toggle-btn-enabled");
     let counter = 2;
     let intervalId;
 
-    pre.addEventListener("touchstart", startEvent);
-    pre.addEventListener("touchend", endEvent);
-
-    pre.addEventListener("mouseenter", startEvent);
-    pre.addEventListener("mouseleave", endEvent);
-
-    pre.appendChild(div);
-
-    function endEvent(e) {
+    let endEvent = function (e) {
       if (intervalId) return;
 
-      let cancelTime = /mouse.*$/i.test(e.type) ? 0 : 1000;
+      // Performance: indexOf > test (Reg) > match
+      let cancelTime = e.type.indexOf('m') > -1 ? 0 : 1000; // mouse
 
       intervalId = setInterval(() => {
         if (--counter <= 0) {
-          div.classList.remove(toggleBtnTouchClz);
+          btn.classList.remove(toggleBtnTouchClz);
           clearInterval(intervalId);
           intervalId = null;
         }
       }, cancelTime);
-    }
+    };
 
-    function startEvent() {
+    let startEvent = function () {
       counter = 2;
 
       if (intervalId) {
@@ -128,63 +161,59 @@ export default (() => {
         intervalId = null;
       }
 
-      div.classList.add(toggleBtnTouchClz);
-    }
+      btn.classList.add(toggleBtnTouchClz);
+    };
+
+    pre.addEventListener("touchstart", startEvent);
+    pre.addEventListener("touchend", endEvent);
+
+    pre.addEventListener("mouseenter", startEvent);
+    pre.addEventListener("mouseleave", endEvent);
+
+    codeWrapper.appendChild(btn);
   }
 
-  function setWrapClz(wrap, code) {
-    if (!code.classList.contains("soft-wrap")
-      && !code.classList.contains("soft-wrap"))
-      code.classList.add(wrap ? "soft-wrap" : "hard-wrap");
+  function toggleSoftWrap(code) {
+    code.classList.toggle('soft-wrap');
   }
 
-  function addNumsListener() {
-    let numClz = '.' + classPrefix + '-' + 'number';
-    let nums = document.querySelectorAll(numClz);
-    let highlightClz = classPrefix + '-' + 'row-highlight';
-
-    Array.from(nums).forEach(n => {
-      n.addEventListener('click', e => {
-        let content = e.target.nextSibling;
-        if (!content) return;
-        content.classList.toggle(highlightClz)
-      });
-    });
-  }
-
-  function getDeviceWidth() {
-    return window.innerWidth > 0 ? window.innerWidth : screen.width;
-  }
-
-  function getLines(code) {
-    const text = code.innerHTML;
-    return 0 === text.length ? [] : text.split(/\r?\n|\r/g);
-  }
 
   function getPrefixClzName(name) {
     return classPrefix + "-" + name;
   }
 
-  function buildElement(type, clzName, noPrefix = false) {
-    const el = document.createElement(type);
-    if (clzName) {
-      clzName = noPrefix ? clzName : getPrefixClzName(clzName);
-      el.classList.add(clzName);
+  function createElementWithClz(type, clzName, noPrefix = false) {
+    const key = '' + type + clzName + noPrefix;
+    let cache = elementProto[key];
+    let result;
+
+    if (cache) {
+      result = cache.cloneNode(false);
+    } else {
+      result = createNewElement();
+      elementProto[key] = result;
     }
-    return el;
+
+    return result;
+
+    function createNewElement() {
+      const el = document.createElement(type);
+      if (clzName) {
+        clzName = noPrefix ? clzName : getPrefixClzName(clzName);
+        el.classList.add(clzName);
+      }
+      return el;
+    }
   }
+
 
   function addPrefixClzToElement(el, clzName) {
     el.classList.add(getPrefixClzName(clzName));
   }
 
   function setCodeLength(length, code) {
-    if (length > 999)
-      addPrefixClzToElement(code, "over-thousand");
-    else if (length > 99)
-      addPrefixClzToElement(code, "over-hundred");
-    else
-      addPrefixClzToElement(code, "under-hundred");
+    const clzName = length > 999 ? 'over-thousand' : length > 99 ? 'over-hundred' : 'under-hundred';
+    addPrefixClzToElement(code, clzName);
   }
 
 })();

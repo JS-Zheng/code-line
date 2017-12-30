@@ -79,7 +79,7 @@ As a result, you can slide your screen without losing direction and number.
 If you don't like it, just append your CSS rules, like:
 
 ```css
-pre.line-numbers code {
+pre.cljs code {
   position: relative;
 }  
 ```

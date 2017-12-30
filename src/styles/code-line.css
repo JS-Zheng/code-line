@@ -1,9 +1,17 @@
 pre, pre * {
-  -webkit-transition: .4s;
-  transition: .4s
+  -webkit-transition-property: opacity, margin;
+  -o-transition-property: opacity, margin;
+  transition-property: opacity, margin;
+  -webkit-transition-duration: .5s;
+  -o-transition-duration: .5s;
+  transition-duration: .5s
 }
 
-pre .cljs-toggle-btn {
+.cljs-wrapper {
+  position: relative
+}
+
+.cljs-toggle-btn {
   position: absolute;
   background-color: #fff;
   opacity: 0;
@@ -13,11 +21,11 @@ pre .cljs-toggle-btn {
   right: .6em
 }
 
-pre .cljs-toggle-btn-enabled {
+.cljs-toggle-btn-enabled {
   opacity: .5
 }
 
-pre .cljs-toggle-btn::after {
+.cljs-toggle-btn::after {
   content: "";
   display: inline-block;
   width: 25px;
@@ -26,10 +34,12 @@ pre .cljs-toggle-btn::after {
   background-size: contain
 }
 
-pre .cljs-toggle-btn:hover {
+.cljs-toggle-btn:hover {
   -webkit-transition: initial;
+  -o-transition: initial;
   transition: initial;
   -webkit-transform: translate(-1px, -1px);
+  -ms-transform: translate(-1px, -1px);
   transform: translate(-1px, -1px)
 }
 
@@ -46,7 +56,10 @@ pre.cljs code {
   -webkit-text-size-adjust: 100%;
   -ms-text-size-adjust: 100%;
   -moz-text-size-adjust: 100%;
-  text-size-adjust: 100%
+  text-size-adjust: 100%;
+  -webkit-transition: background .5s;
+  -o-transition: background .5s;
+  transition: background .5s
 }
 
 .cljs-container {
@@ -75,6 +88,11 @@ pre.cljs .cljs-number {
   line-height: calc(var(--cljs-code-line-height, 1.35) + .1)
 }
 
+pre.cljs .cljs-number:hover {
+  -webkit-filter: brightness(200%);
+  filter: brightness(200%)
+}
+
 pre.cljs .cljs-number::before {
   content: counter(linenumber);
   text-align: right;
@@ -87,6 +105,7 @@ pre.cljs .cljs-number::before {
 }
 
 pre.cljs .cljs-row * {
+  -webkit-box-sizing: content-box;
   box-sizing: content-box
 }
 
@@ -114,7 +133,7 @@ pre.cljs code.cljs-over-thousand .cljs-content {
   margin-left: 4.2em
 }
 
-pre.cljs .hard-wrap {
+pre.cljs {
   white-space: pre
 }
 
