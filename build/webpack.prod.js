@@ -13,7 +13,7 @@ var banner = pkgJson.name + ' v' + pkgJson.version + '\n' +
 
 module.exports = merge(common, {
   plugins: [
-    new CleanWebpackPlugin(['dist'], {root: path.resolve(__dirname , '..'), exclude:  ['code-line.esm.js']}),
+    new CleanWebpackPlugin(['dist'], {root: path.resolve(__dirname, '..'), exclude: ['code-line.esm.js']}),
     new UglifyJSPlugin(),
     new webpack.DefinePlugin({
       'process.env': require('../config/prod.env')

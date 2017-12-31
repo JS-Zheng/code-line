@@ -1,12 +1,20 @@
-import numberIcon from './img/numbered-list.svg'
-import './styles/code-line.css'
+import './styles/code-line.scss'
 import whenReady from './whenReady'
 
 export default (() => {
 
   const classPrefix = 'cljs';
   const numClickEventName = '$_' + classPrefix + 'NumClickEvent';
+
   let elementProto = {};
+
+  function getElementPrototype(key) {
+    return elementProto[key];
+  }
+
+  function setElementPrototype(key, element) {
+    elementProto[key] = element;
+  }
 
   function CodeLine() {
     const self = this;
@@ -17,9 +25,8 @@ export default (() => {
     this.disableOnMobile = true;
     this.maxMobileWidth = 420;
 
-
     this.loadLineNumbers = function () {
-      let codes = document.querySelectorAll("pre code");
+      let codes = document.querySelectorAll("pre > code");
       const deviceWidth = getDeviceWidth();
 
       // for Performance is faster than Array#forEach:
@@ -34,22 +41,29 @@ export default (() => {
         if (deviceWidth > self.maxMobileWidth || !self.disableOnMobile)
           pre.classList.add(classPrefix);
 
+        let codeWrapper = appendCodeWrapper(pre, code);
+
         splitCodeLayout(code, lines);
 
-        if (self.showToggleBtn)
-          appendToggleButton(pre, code);
+        setMaxDigit(codeWrapper, lines.length);
+
+        if (self.showToggleBtn) {
+          let btn = createToggleButton(pre);
+          codeWrapper.appendChild(btn);
+        }
 
         if (self.softWrap)
           toggleSoftWrap(code);
+
       } // for End
 
-      // free cache
+      // free
       elementProto = {};
 
       setGlobalNumClickEvent();
 
       function setGlobalNumClickEvent() {
-        let highlightClz = classPrefix + '-' + 'row-highlight';
+        let highlightClz = classPrefix + '-' + 'highlight';
         window[numClickEventName] = function (e) {
           let content = e.target.nextSibling;
           if (!content) return;
@@ -76,23 +90,27 @@ export default (() => {
     return !text.length ? [] : text.split(/\r?\n|\r/g);
   }
 
+  function appendCodeWrapper(pre, code) {
+    let codeWrapper = createElementWithClz('div', 'wrapper');
+    pre.appendChild(codeWrapper);
+    codeWrapper.appendChild(code);
+    return codeWrapper;
+  }
+
   function splitCodeLayout(code, lines) {
-    const linesLength = lines.length;
 
     const container = createElementWithClz("div", "container");
-
-    setCodeLength(linesLength, code);
-
-    const rowProto = createRowPrototype();
     const contentClz = getPrefixClzName('content');
 
-    for (let i = 0, line; (line = lines[i] ) || line === ''; i++) {
-      const row = rowProto.cloneNode(true);
+    for (let i = 0, line, nextLine = lines[0]; (line = nextLine ) || line === ''; i++) {
+      nextLine = lines[i + 1];
+
+      const row = createRow();
 
       if (line !== '') {
         // getElementsByClassName is faster than querySelector
         const codeContent = row.getElementsByClassName(contentClz)[0];
-        codeContent.innerHTML = line + '\n';
+        codeContent.innerHTML = line + (nextLine ? '\n' : '');
       }
 
       container.appendChild(row);
@@ -101,35 +119,29 @@ export default (() => {
     code.innerHTML = "";
     code.appendChild(container);
 
-    function createRowPrototype() {
+    function createRow() {
       // use inline event attribute instead of addEventListener
       // to prevent DOM manipulating (e.g., Node Replace) by other script.
       const key = 'rowPrototype';
-      let cache = elementProto[key];
+      let proto = getElementPrototype(key);
 
-      if (cache)
-        return cache;
+      if (!proto) {
+        proto = createElementWithClz('div', 'row');
+        const num = createElementWithClz('div', 'number');
+        const codeContent = createElementWithClz("div", "content");
+        codeContent.innerHTML = '\n';
+        num.setAttribute('onclick', `${numClickEventName}(event)`);
+        proto.appendChild(num);
+        proto.appendChild(codeContent);
 
-      const row = createElementWithClz('div', 'row');
-      const num = createElementWithClz('div', 'number');
-      const codeContent = createElementWithClz("div", "content");
-      codeContent.innerHTML = '\n';
-      num.setAttribute('onclick', `${numClickEventName}(event)`);
-      row.appendChild(num);
-      row.appendChild(codeContent);
+        setElementPrototype(key, proto);
+      }
 
-      elementProto[key] = row;
-
-      return row;
+      return proto.cloneNode(true);
     }
   }
 
-  function appendToggleButton(pre, code) {
-    // appendCodeWrapper
-    const codeWrapper = createElementWithClz("div", "wrapper");
-    pre.appendChild(codeWrapper);
-    codeWrapper.appendChild(code);
-
+  function createToggleButton(pre) {
     // appendToggleBtn
     let btn = createElementWithClz('div', 'toggle-btn');
     btn.addEventListener("click", () => pre.classList.toggle(classPrefix));
@@ -170,7 +182,7 @@ export default (() => {
     pre.addEventListener("mouseenter", startEvent);
     pre.addEventListener("mouseleave", endEvent);
 
-    codeWrapper.appendChild(btn);
+    return btn;
   }
 
   function toggleSoftWrap(code) {
@@ -184,17 +196,14 @@ export default (() => {
 
   function createElementWithClz(type, clzName, noPrefix = false) {
     const key = '' + type + clzName + noPrefix;
-    let cache = elementProto[key];
-    let result;
+    let proto = getElementPrototype(key);
 
-    if (cache) {
-      result = cache.cloneNode(false);
-    } else {
-      result = createNewElement();
-      elementProto[key] = result;
+    if (!proto) {
+      proto = createNewElement();
+      setElementPrototype(key, proto);
     }
 
-    return result;
+    return proto.cloneNode(false);
 
     function createNewElement() {
       const el = document.createElement(type);
@@ -206,14 +215,16 @@ export default (() => {
     }
   }
 
-
   function addPrefixClzToElement(el, clzName) {
     el.classList.add(getPrefixClzName(clzName));
   }
 
-  function setCodeLength(length, code) {
-    const clzName = length > 999 ? 'over-thousand' : length > 99 ? 'over-hundred' : 'under-hundred';
-    addPrefixClzToElement(code, clzName);
+  function setMaxDigit(wrapper, length) {
+    const clzName = length < 9 ? 'one' :
+      length < 99 ? 'ten' :
+        length < 999 ? 'hundred' : 'thousand';
+
+    addPrefixClzToElement(wrapper, clzName);
   }
 
 })();

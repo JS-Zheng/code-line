@@ -32,10 +32,14 @@ module.exports = {
         }
       },
       {
-        test: /\.css$/,
-        use: [
-          'style-loader',
-          'css-loader'
+        test: /\.scss$/,
+        exclude: /node_modules/,
+        use: [ // applied from right to left (last to first configured).
+          'style-loader', // creates style nodes from JS strings
+          // importLoaders: Number of loaders applied before CSS loader
+          {loader: 'css-loader', options: {importLoaders: 2}}, // translates CSS into CommonJS
+          'postcss-loader', // To process CSS with PostCSS
+          "sass-loader" // compiles Sass to CSS
         ]
       },
       {

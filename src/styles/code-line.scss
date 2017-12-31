@@ -1,0 +1,154 @@
+$prefix: cljs;
+
+@mixin text-border($width,$color) {
+  text-shadow: 0 (-$width) $color, $width 0 $color, 0 $width $color, (-$width) 0 $color;
+}
+
+pre {
+
+  .#{$prefix}-wrapper {
+    position: relative
+  }
+
+  .#{$prefix}-container {
+    display: inline-block;
+    min-width: 100%
+  }
+
+  .#{$prefix}-container, .#{$prefix}-row {
+    background: inherit
+  }
+
+  .#{$prefix}-content {
+    transition: {
+      property: margin-left;
+      duration: .35s
+    }
+
+    * {
+      transition: color .5s
+    }
+  }
+
+  .#{$prefix}-toggle-btn {
+    position: absolute;
+    background-color: #fff;
+    opacity: 0;
+    padding: 2px;
+    border-radius: 25%;
+    top: .65em;
+    right: .65em;
+    transition: {
+      property: opacity;
+      duration: .35s
+    }
+
+    &::after {
+      content: "";
+      display: inline-block;
+      width: 25px;
+      height: 25px;
+      background: url(../img/numbered-list.svg) no-repeat;
+      background-size: contain
+    }
+
+    &:hover {
+      //transition: initial;
+      transform: translate(-2px, -2px)
+    }
+  }
+
+  .#{$prefix}-toggle-btn-enabled {
+    opacity: .5
+  }
+
+  // Code-Line.js Enabled
+  &.#{$prefix} {
+
+    $code-line-height: 1.45;
+    $basicNumberWidth: 1.55em;
+
+    code {
+      overflow-wrap: normal;
+      word-wrap: normal;
+      word-break: normal;
+      white-space: pre;
+      overflow-x: auto;
+      display: block;
+      line-height: $code-line-height;
+      counter-reset: linenumber;
+      text-size-adjust: 100%;
+      transition: background .5s, padding .5s
+    }
+
+    .#{$prefix}-highlight {
+      background-color: #ef9a9a;
+      filter: contrast(120%);
+      @include text-border(.5px, black);
+      color: #fff
+    }
+
+    .#{$prefix}-number {
+      position: absolute;
+      left: 0; // Prevent padding from <code>
+      text-align: right;
+      letter-spacing: 1px;
+      background: inherit;
+      opacity: .9;
+      counter-increment: linenumber;
+      border-right: solid 1px #ddd;
+      z-index: 10;
+
+      &:hover {
+        filter: brightness(200%)
+      }
+
+      &::before {
+        content: counter(linenumber);
+        position: relative;
+        right: .4em
+      }
+    }
+
+    .#{$prefix}-row {
+      // fix margin collapsing
+      margin-bottom: -.15px
+    }
+
+    .#{$prefix}-row * {
+      box-sizing: content-box
+    }
+
+    .soft-wrap {
+      white-space: pre-wrap;
+
+      .#{$prefix}-row {
+        //overflow: hidden;
+        position: relative
+      }
+
+      .#{$prefix}-number {
+        height: 100%
+      }
+    }
+
+    @each $digit, $width in (one:$basicNumberWidth, ten:$basicNumberWidth+0.6,
+            hundred:$basicNumberWidth+1.2, thousand:$basicNumberWidth+1.8) {
+      // class chain
+      .#{$prefix}-wrapper.#{$prefix}-#{$digit} {
+
+        .#{$prefix}-number {
+          width: $width
+        }
+
+        .#{$prefix}-content {
+          margin-left: $width+.5
+        }
+      }
+    }
+
+  }
+
+}
+
+
