@@ -1,7 +1,7 @@
 const path = require('path');
 
 module.exports = {
-  entry: './src/code-line.js',
+  entry: ['./src/code-line.js'],
   resolve: {
     alias: {
       'vue$': 'vue/dist/vue.esm.js' // 'vue/dist/vue.common.js' for webpack 1
@@ -26,7 +26,7 @@ module.exports = {
     rules: [
       {
         test: /\.js$/,
-        exclude: /(node_modules|bower_components)/,
+        exclude: /node_modules/,
         use: {
           loader: 'babel-loader'
         }

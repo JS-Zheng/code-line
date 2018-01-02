@@ -95,7 +95,7 @@ If you want to use `Soft Wrap`, append `soft-wrap` class to your `<code>`:
 
 ### Widget
 
-Currently, CodeLine supports two widgets -- **CopyButton** & **LineNumbersToggle**.
+Currently, CodeLine supports two widgets -- **ToggleButtonFactory** & **LineNumbersToggle**.
 
 <img src="demo/img/two-widgets.png" alt="two-widgets.png" width="500px">
 
@@ -113,8 +113,8 @@ It may be useful or annoying, you can enable/disable it whatever you love.
 | `softWrap`       | {Boolean} | false                                                | Enable/Disable softwrap                                       |
 | `showOnMobile`   | {Boolean} | false                                                | Enable/Disable Line Numbers on mobile                         |
 | `maxMobileWidth` | {Number}  | 420                                                  | Width below the `maxMobileWidth` will be considered as mobile |
-| `copyBtn`        | {Object}  | {show: true, showOnMobile: true, position: 'top'}    | The setting of the `Copy Button`                              |
-| `toggleBtn`      | {Object}  | {show: true, showOnMobile: true, position: 'bottom'} | The setting of the `Line Numbers Toggle Button`               |
+| `copyBtn`        | {Object}  | {show: true, position: 'bottom', showOnMobile: false, positionOnMobile: 'bottom'}    | The setting of the `Copy Button`                              |
+| `toggleBtn`      | {Object}  | {show: true, position: 'top', showOnMobile: true, positionOnMobile: 'top'} | The setting of the `Line Numbers Toggle Button`               |
 
 Example:
 ```html
