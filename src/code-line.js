@@ -1,10 +1,10 @@
 import './styles/code-line.scss'
 import whenReady from './utils/whenReady'
 import DomManager from './utils/DomManager'
-import CodeRowFactory from './components/CodeRowFactory'
-import CopyButtonFactory from "./components/CopyButtonFactory";
-import AbstractWidget from "./components/AbstractWidgetFactory";
-import ToggleButtonFactory from "./components/ToggleButtonFactory";
+import CodeRowFactory from './components/factory/CodeRowFactory'
+import WidgetManipulator from "./components/manipulator/WidgetManipulator";
+import ToggleBtnFactory from "./components/factory/ToggleBtnFactory";
+import CopyBtnFactory from "./components/factory/CopyBtnFactory";
 
 let env = process.env;
 console.log(`==== ${env.NAME} ${env.NODE_ENV} v${env.VERSION} ====`);
@@ -13,8 +13,9 @@ const classPrefix = 'cljs';
 const numClickEventName = '$_' + classPrefix + 'NumClickEvent';
 const domManager = new DomManager(classPrefix);
 const codeRowFactory = new CodeRowFactory(domManager, numClickEventName);
-let copyBtnFactory = null;
-let toggleBtnFactory = null;
+
+let widgetFactories = {};
+let widgetManipulators = {};
 
 function CodeLine() {
   const self = this;
@@ -30,16 +31,16 @@ function CodeLine() {
     // Widgets Options
     copyBtn: {
       show: true,
-      position: AbstractWidget.POSITION_BOTTOM,
+      position: 'bottom',
       showOnMobile: false,
-      positionOnMobile: AbstractWidget.POSITION_BOTTOM
+      positionOnMobile: 'bottom'
     },
 
     toggleBtn: {
       show: true,
-      position: AbstractWidget.POSITION_TOP,
+      position: 'top',
       showOnMobile: true,
-      positionOnMobile: AbstractWidget.POSITION_TOP
+      positionOnMobile: 'top'
     }
   };
 
@@ -149,23 +150,29 @@ function setMaxDigit(wrapper, length) {
   domManager.addPrefixClzToElement(wrapper, clzName);
 }
 
+
 function setupWidgets(isMobile, pre, codeWrapper, code) {
-  let copyBtnOptions = this.options.copyBtn;
-  let toggleBtnOptions = this.options.toggleBtn;
+  let self = this;
 
-  let showCopyBtn = AbstractWidget.canShowWidget(isMobile, copyBtnOptions);
-  let showToggleBtn = AbstractWidget.canShowWidget(isMobile, toggleBtnOptions);
+  setupWidget('copyBtn', CopyBtnFactory);
+  setupWidget('toggleBtn', ToggleBtnFactory);
 
-  if (showCopyBtn) {
-    if (!copyBtnFactory) copyBtnFactory = new CopyButtonFactory(domManager, isMobile, copyBtnOptions);
-    let copyBtn = copyBtnFactory.create();
-    copyBtnFactory.setup(copyBtn, codeWrapper, code);
-  }
+  function setupWidget(name, factoryClz) {
+    let factory, manipulator;
+    let options = self.options[name];
 
-  if (showToggleBtn) {
-    if (!toggleBtnFactory) toggleBtnFactory = new ToggleButtonFactory(domManager, isMobile, toggleBtnOptions);
-    let toggleBtn = toggleBtnFactory.create();
-    toggleBtnFactory.setup(toggleBtn, pre, codeWrapper);
+    if (!options) return;
+
+    let canShow = WidgetManipulator.canShowWidget(isMobile, options);
+
+    if (!canShow) return;
+
+    if (!(factory = widgetFactories[name]))
+      widgetFactories[name] = factory = new factoryClz(domManager);
+    let widget = factory.create();
+    if (!(manipulator = widgetManipulators[name]))
+      widgetManipulators[name] = manipulator = factory.createManipulator();
+    manipulator.setup(isMobile, options, widget, pre, codeWrapper, code);
   }
 }
 

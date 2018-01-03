@@ -106,15 +106,15 @@ It may be useful or annoying, you can enable/disable it whatever you love.
 ### Options
 
 
-| Name             | Type      | Default                                              | Description                                                   |
-|------------------|-----------|------------------------------------------------------|---------------------------------------------------------------|
-| `minLine`        | {Number}  | 3                                                    | Code below `minLine` will not be applied                      |
-| `show`           | {Boolean} | true                                                 | Enable/Disable Line Numbers                                   |
-| `softWrap`       | {Boolean} | false                                                | Enable/Disable softwrap                                       |
-| `showOnMobile`   | {Boolean} | false                                                | Enable/Disable Line Numbers on mobile                         |
-| `maxMobileWidth` | {Number}  | 420                                                  | Width below the `maxMobileWidth` will be considered as mobile |
-| `copyBtn`        | {Object}  | {show: true, position: 'bottom', showOnMobile: false, positionOnMobile: 'bottom'}    | The setting of the `Copy Button`                              |
-| `toggleBtn`      | {Object}  | {show: true, position: 'top', showOnMobile: true, positionOnMobile: 'top'} | The setting of the `Line Numbers Toggle Button`               |
+| Name             | Type      | Default                                                                           | Description                                                   |
+|------------------|-----------|-----------------------------------------------------------------------------------|---------------------------------------------------------------|
+| `minLine`        | {Number}  | 3                                                                                 | Code below `minLine` will not be applied                      |
+| `show`           | {Boolean} | true                                                                              | Enable/Disable Line Numbers                                   |
+| `showOnMobile`   | {Boolean} | false                                                                             | Enable/Disable Line Numbers on mobile                         |
+| `softWrap`       | {Boolean} | false                                                                             | Enable/Disable softwrap                                       |
+| `maxMobileWidth` | {Number}  | 420                                                                               | Width below the `maxMobileWidth` will be considered as mobile |
+| `copyBtn`        | {Object}  | {show: true, position: 'bottom', showOnMobile: false, positionOnMobile: 'bottom'} | The setting of the `Copy Button`                              |
+| `toggleBtn`      | {Object}  | {show: true, position: 'top', showOnMobile: true, positionOnMobile: 'top'}        | The setting of the `Line Numbers Toggle Button`               |
 
 Example:
 ```html
@@ -123,7 +123,6 @@ Example:
     showOnMobile: true,
     toggleBtn: {show: true, showOnMobile: false, position: 'bottom'}
   })
-
 </script>
 </script>
 ```

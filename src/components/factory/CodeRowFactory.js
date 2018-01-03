@@ -1,4 +1,4 @@
-import AbstractComponent from "./AbstractComponentFactory";
+import AbstractComponent from "./AbsComponentFactory";
 
 class CodeRowFactory extends AbstractComponent {
   constructor(prototypeManager, numEventName) {
@@ -7,7 +7,9 @@ class CodeRowFactory extends AbstractComponent {
   }
 }
 
-CodeRowFactory.prototype.getKey = () => '_CodeRow';
+CodeRowFactory.prototype.getKey = function () {
+  return 'CodeRow'
+};
 
 CodeRowFactory.prototype.createProto = function () {
   let proto = this.domManager.createElementWithClz('div', 'row');

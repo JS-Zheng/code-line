@@ -1,27 +1,17 @@
-import AbstractWidgetFactory from "./AbstractWidgetFactory";
-import HoverMocker from "../utils/HoverMocker";
+import WidgetManipulator from "./WidgetManipulator";
+import HoverMocker from "../../utils/HoverMocker";
 import Clipboard from 'clipboard'
 
-class CopyButtonFactory extends AbstractWidgetFactory {
+class CopyBtnManipulator extends WidgetManipulator {
 }
 
-CopyButtonFactory.prototype.getKey = () => '_CopyBtn';
-
-CopyButtonFactory.prototype.createProto = function () {
-  let proto = this.domManager.createElementWithClz('button', 'copy-btn');
-  proto.textContent = 'Copy';
-  proto.setAttribute('data-tooltip-text', 'Copy to clipboard');
-
-  return proto;
-};
-
-CopyButtonFactory.prototype.setup = function (copyBtn, codeWrapper, code) {
+CopyBtnManipulator.prototype.setup = function (isMobile, options, copyBtn, pre, codeWrapper, code) {
   let hintText = 'Copy to clipboard';
   let hover = new HoverMocker(copyBtn, this.domManager.getPrefixClzName("copy-btn-hover"));
   hover.onStart(restoreHintText);
 
   codeWrapper.appendChild(copyBtn);
-  this.setWidgetPosition(copyBtn);
+  this.setWidgetPosition(isMobile, options, copyBtn);
 
   let clipboard = new Clipboard(copyBtn, {
     target: function () {
@@ -46,7 +36,6 @@ CopyButtonFactory.prototype.setup = function (copyBtn, codeWrapper, code) {
   function restoreHintText(e) {
     e.target.setAttribute('data-tooltip-text', hintText);
   }
-
 };
 
-export default CopyButtonFactory;
+export default CopyBtnManipulator;

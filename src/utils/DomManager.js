@@ -6,11 +6,11 @@ function DomManager(prefix) {
 DomManager.prototype = {
   constructor: DomManager,
 
-  getElementPrototype: function (key) {
-    return this.elementProto[key];
+  getElementPrototype: function (key, isComponent = false) {
+    return this.elementProto[isComponent + key];
   },
-  setElementPrototype: function (key, element) {
-    this.elementProto[key] = element;
+  setElementPrototype: function (key, element, isComponent = false) {
+    this.elementProto[isComponent + key] = element;
   },
   clearPrototype: function () {
     this.elementProto = null;
@@ -27,6 +27,7 @@ DomManager.prototype = {
       }
       this.setElementPrototype(key, proto);
     }
+
 
     return proto.cloneNode(false);
   },
