@@ -2,12 +2,13 @@ import './styles/code-line.scss'
 import whenReady from './utils/whenReady'
 import DomManager from './utils/DomManager'
 import CodeRowFactory from './components/factory/CodeRowFactory'
-import WidgetManipulator from "./components/manipulator/WidgetManipulator";
-import ToggleBtnFactory from "./components/factory/ToggleBtnFactory";
-import CopyBtnFactory from "./components/factory/CopyBtnFactory";
+import WidgetManipulator from './components/manipulator/WidgetManipulator';
+import ToggleBtnFactory from './components/factory/ToggleBtnFactory';
+import CopyBtnFactory from './components/factory/CopyBtnFactory';
 
 let env = process.env;
-console.log(`==== ${env.NAME} ${env.NODE_ENV} v${env.VERSION} ====`);
+if (env.NODE_ENV !== 'production')
+  console.log(`==== ${env.NAME} ${env.NODE_ENV} v${env.VERSION} ====`);
 
 const classPrefix = 'cljs';
 const numClickEventName = '$_' + classPrefix + 'NumClickEvent';
@@ -45,16 +46,21 @@ function CodeLine() {
   };
 
   this.loadLineNumbers = function (options = {}) {
-    setOptions.call(self, defaultOptions, options);
+    resolveOptions.call(self, defaultOptions, options);
 
-    let codes = document.querySelectorAll("pre > code");
+    let codes = document.querySelectorAll('pre code');
     const deviceWidth = getDeviceWidth();
 
     // for Performance is faster than Array#forEach:
     for (let i = 0, code; code = codes[i]; i++) {
-      const pre = code.parentNode;
+      let pre = code.parentNode;
+      if (pre.tagName !== 'PRE') {
+        do {
+          pre = pre.parentNode;
+        } while (pre.tagName !== 'PRE')
+      }
 
-      if (code.matches(".nohighlight")) continue;
+      if (code.matches('.nohighlight')) continue;
 
       let lines = getLines(code);
       if (!lines || lines.length < self.options.minLine) continue;
@@ -76,16 +82,14 @@ function CodeLine() {
 
     } // for End
 
-    setGlobalNumClickEvent();
-
-    function setGlobalNumClickEvent() {
+    (function setGlobalNumClickEvent() {
       let highlightClz = classPrefix + '-' + 'highlight';
       window[numClickEventName] = function (e) {
         let content = e.target.nextSibling;
         if (!content) return;
         content.classList.toggle(highlightClz)
       };
-    }
+    })();
 
     // free
     domManager.clearPrototype();
@@ -97,7 +101,7 @@ function CodeLine() {
   }
 }
 
-function setOptions(defaultOptions, options) {
+function resolveOptions(defaultOptions, options) {
   let mergedCopyBtn = Object.assign({}, defaultOptions.copyBtn, options.copyBtn);
   let mergedToggleBtn = Object.assign({}, defaultOptions.toggleBtn, options.toggleBtn);
   Object.assign(this.options, defaultOptions, options, {copyBtn: mergedCopyBtn, toggleBtn: mergedToggleBtn});
@@ -121,7 +125,7 @@ function appendCodeWrapper(pre, code) {
 }
 
 function splitCodeLayout(code, lines) {
-  const container = domManager.createElementWithClz("div", "container");
+  const container = domManager.createElementWithClz('div', 'container');
   const contentClz = domManager.getPrefixClzName('content');
 
   for (let i = 0, line, nextLine = lines[0]; (line = nextLine ) || line === ''; i++) {
@@ -138,7 +142,7 @@ function splitCodeLayout(code, lines) {
     container.appendChild(row);
   }
 
-  code.innerHTML = "";
+  code.innerHTML = '';
   code.appendChild(container);
 }
 
