@@ -73,7 +73,7 @@ We usually have to trace codes with mobile devices.
 Line-numbers.js use `position: absolute` default.  
 As a result, you can slide your screen without losing direction and number.  
 
-<img src="demo/img/slide-it.jpg" alt="slide it!" width="500px">
+<img src="demo/img/slide-it.png" alt="slide it!" width="400px">
 
 
 If you don't like it, just append your CSS rules, like:
