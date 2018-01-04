@@ -1,7 +1,7 @@
 const path = require('path');
 
 module.exports = {
-  entry: './src/code-line.js',
+  entry: ['./src/code-line.js'],
   resolve: {
     alias: {
       'vue$': 'vue/dist/vue.esm.js' // 'vue/dist/vue.common.js' for webpack 1
@@ -26,16 +26,20 @@ module.exports = {
     rules: [
       {
         test: /\.js$/,
-        exclude: /(node_modules|bower_components)/,
+        exclude: /node_modules/,
         use: {
           loader: 'babel-loader'
         }
       },
       {
-        test: /\.css$/,
-        use: [
-          'style-loader',
-          'css-loader'
+        test: /\.scss$/,
+        exclude: /node_modules/,
+        use: [ // applied from right to left (last to first configured).
+          'style-loader', // creates style nodes from JS strings
+          // importLoaders: Number of loaders applied before CSS loader
+          {loader: 'css-loader', options: {importLoaders: 2}}, // translates CSS into CommonJS
+          'postcss-loader', // To process CSS with PostCSS
+          "sass-loader" // compiles Sass to CSS
         ]
       },
       {

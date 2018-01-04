@@ -1,219 +1,189 @@
-import numberIcon from './img/numbered-list.svg'
-import './styles/code-line.css'
-import whenReady from './whenReady'
+import './styles/code-line.scss'
+import whenReady from './utils/whenReady'
+import DomManager from './utils/DomManager'
+import CodeRowFactory from './components/factory/CodeRowFactory'
+import WidgetManipulator from './components/manipulator/WidgetManipulator';
+import ToggleBtnFactory from './components/factory/ToggleBtnFactory';
+import CopyBtnFactory from './components/factory/CopyBtnFactory';
 
-export default (() => {
+let env = process.env;
+if (env.NODE_ENV !== 'production')
+  console.log(`==== ${env.NAME} ${env.NODE_ENV} v${env.VERSION} ====`);
 
-  const classPrefix = 'cljs';
-  const numClickEventName = '$_' + classPrefix + 'NumClickEvent';
-  let elementProto = {};
+const classPrefix = 'cljs';
+const numClickEventName = '$_' + classPrefix + 'NumClickEvent';
+const domManager = new DomManager(classPrefix);
+const codeRowFactory = new CodeRowFactory(domManager, numClickEventName);
 
-  function CodeLine() {
-    const self = this;
+let widgetFactories = {};
+let widgetManipulators = {};
 
-    this.minLies = 3;
-    this.softWrap = false;
-    this.showToggleBtn = true;
-    this.disableOnMobile = true;
-    this.maxMobileWidth = 420;
+function CodeLine() {
+  const self = this;
+  this.options = {};
 
+  let defaultOptions = {
+    minLine: 3,
+    show: true,
+    softWrap: false,
+    showOnMobile: false,
+    maxMobileWidth: 420,
 
-    this.loadLineNumbers = function () {
-      let codes = document.querySelectorAll("pre code");
-      const deviceWidth = getDeviceWidth();
+    // Widgets Options
+    copyBtn: {
+      show: true,
+      position: 'bottom',
+      showOnMobile: false,
+      positionOnMobile: 'bottom'
+    },
 
-      // for Performance is faster than Array#forEach:
-      for (let i = 0, code; code = codes[i]; i++) {
-        const pre = code.parentNode;
+    toggleBtn: {
+      show: true,
+      position: 'top',
+      showOnMobile: true,
+      positionOnMobile: 'top'
+    }
+  };
 
-        if (pre.matches(".nohighlight") || code.matches(".nohighlight")) continue;
+  this.loadLineNumbers = function (options = {}) {
+    resolveOptions.call(self, defaultOptions, options);
 
-        let lines = getLines(code);
-        if (!lines || lines.length < self.minLies) continue;
+    let codes = document.querySelectorAll('pre code');
+    const deviceWidth = getDeviceWidth();
 
-        if (deviceWidth > self.maxMobileWidth || !self.disableOnMobile)
-          pre.classList.add(classPrefix);
-
-        splitCodeLayout(code, lines);
-
-        if (self.showToggleBtn)
-          appendToggleButton(pre, code);
-
-        if (self.softWrap)
-          toggleSoftWrap(code);
-      } // for End
-
-      // free cache
-      elementProto = {};
-
-      setGlobalNumClickEvent();
-
-      function setGlobalNumClickEvent() {
-        let highlightClz = classPrefix + '-' + 'row-highlight';
-        window[numClickEventName] = function (e) {
-          let content = e.target.nextSibling;
-          if (!content) return;
-          content.classList.toggle(highlightClz)
-        };
+    // for Performance is faster than Array#forEach:
+    for (let i = 0, code; code = codes[i]; i++) {
+      let pre = code.parentNode;
+      if (pre.tagName !== 'PRE') {
+        do {
+          pre = pre.parentNode;
+        } while (pre.tagName !== 'PRE')
       }
 
-    };
+      if (code.matches('.nohighlight')) continue;
 
-    this.initOnPageLoad = function () {
-      whenReady(this.loadLineNumbers);
-    }
+      let lines = getLines(code);
+      if (!lines || lines.length < self.options.minLine) continue;
+
+      let isMobile = deviceWidth <= self.options.maxMobileWidth;
+      if ((isMobile && self.options.showOnMobile) || (!isMobile && self.options.show))
+        pre.classList.add(classPrefix);
+
+      let codeWrapper = appendCodeWrapper(pre, code);
+
+      splitCodeLayout(code, lines);
+
+      setMaxDigit(codeWrapper, lines.length);
+
+      setupWidgets.call(self, isMobile, pre, codeWrapper, code);
+
+      if (self.options.softWrap)
+        setSoftWrapMode(code);
+
+    } // for End
+
+    (function setGlobalNumClickEvent() {
+      let highlightClz = classPrefix + '-' + 'highlight';
+      window[numClickEventName] = function (e) {
+        let content = e.target.nextSibling;
+        if (!content) return;
+        content.classList.toggle(highlightClz)
+      };
+    })();
+
+    // free
+    domManager.clearPrototype();
+  };
+
+  this.initOnPageLoad = function (options = {}) {
+    let bindOptionsFunction = self.loadLineNumbers.bind(self, options);
+    whenReady(bindOptionsFunction);
   }
+}
 
-  return new CodeLine();
+function resolveOptions(defaultOptions, options) {
+  let mergedCopyBtn = Object.assign({}, defaultOptions.copyBtn, options.copyBtn);
+  let mergedToggleBtn = Object.assign({}, defaultOptions.toggleBtn, options.toggleBtn);
+  Object.assign(this.options, defaultOptions, options, {copyBtn: mergedCopyBtn, toggleBtn: mergedToggleBtn});
+}
 
-  function getDeviceWidth() {
-    const wWidth = window.innerWidth;
-    return wWidth > 0 ? wWidth : screen.width;
-  }
+function getDeviceWidth() {
+  const wWidth = window.innerWidth;
+  return wWidth > 0 ? wWidth : screen.width;
+}
 
-  function getLines(code) {
-    const text = code.innerHTML;
-    return !text.length ? [] : text.split(/\r?\n|\r/g);
-  }
+function getLines(code) {
+  const text = code.innerHTML;
+  return !text.length ? [] : text.split(/\r?\n|\r/g);
+}
 
-  function splitCodeLayout(code, lines) {
-    const linesLength = lines.length;
+function appendCodeWrapper(pre, code) {
+  let codeWrapper = domManager.createElementWithClz('div', 'wrapper');
+  pre.appendChild(codeWrapper);
+  codeWrapper.appendChild(code);
+  return codeWrapper;
+}
 
-    const container = createElementWithClz("div", "container");
+function splitCodeLayout(code, lines) {
+  const container = domManager.createElementWithClz('div', 'container');
+  const contentClz = domManager.getPrefixClzName('content');
 
-    setCodeLength(linesLength, code);
+  for (let i = 0, line, nextLine = lines[0]; (line = nextLine ) || line === ''; i++) {
+    nextLine = lines[i + 1];
 
-    const rowProto = createRowPrototype();
-    const contentClz = getPrefixClzName('content');
+    const row = codeRowFactory.create();
 
-    for (let i = 0, line; (line = lines[i] ) || line === ''; i++) {
-      const row = rowProto.cloneNode(true);
-
-      if (line !== '') {
-        // getElementsByClassName is faster than querySelector
-        const codeContent = row.getElementsByClassName(contentClz)[0];
-        codeContent.innerHTML = line + '\n';
-      }
-
-      container.appendChild(row);
-    }
-
-    code.innerHTML = "";
-    code.appendChild(container);
-
-    function createRowPrototype() {
-      // use inline event attribute instead of addEventListener
-      // to prevent DOM manipulating (e.g., Node Replace) by other script.
-      const key = 'rowPrototype';
-      let cache = elementProto[key];
-
-      if (cache)
-        return cache;
-
-      const row = createElementWithClz('div', 'row');
-      const num = createElementWithClz('div', 'number');
-      const codeContent = createElementWithClz("div", "content");
-      codeContent.innerHTML = '\n';
-      num.setAttribute('onclick', `${numClickEventName}(event)`);
-      row.appendChild(num);
-      row.appendChild(codeContent);
-
-      elementProto[key] = row;
-
-      return row;
-    }
-  }
-
-  function appendToggleButton(pre, code) {
-    // appendCodeWrapper
-    const codeWrapper = createElementWithClz("div", "wrapper");
-    pre.appendChild(codeWrapper);
-    codeWrapper.appendChild(code);
-
-    // appendToggleBtn
-    let btn = createElementWithClz('div', 'toggle-btn');
-    btn.addEventListener("click", () => pre.classList.toggle(classPrefix));
-
-    const toggleBtnTouchClz = getPrefixClzName("toggle-btn-enabled");
-    let counter = 2;
-    let intervalId;
-
-    let endEvent = function (e) {
-      if (intervalId) return;
-
-      // Performance: indexOf > test (Reg) > match
-      let cancelTime = e.type.indexOf('m') > -1 ? 0 : 1000; // mouse
-
-      intervalId = setInterval(() => {
-        if (--counter <= 0) {
-          btn.classList.remove(toggleBtnTouchClz);
-          clearInterval(intervalId);
-          intervalId = null;
-        }
-      }, cancelTime);
-    };
-
-    let startEvent = function () {
-      counter = 2;
-
-      if (intervalId) {
-        clearInterval(intervalId);
-        intervalId = null;
-      }
-
-      btn.classList.add(toggleBtnTouchClz);
-    };
-
-    pre.addEventListener("touchstart", startEvent);
-    pre.addEventListener("touchend", endEvent);
-
-    pre.addEventListener("mouseenter", startEvent);
-    pre.addEventListener("mouseleave", endEvent);
-
-    codeWrapper.appendChild(btn);
-  }
-
-  function toggleSoftWrap(code) {
-    code.classList.toggle('soft-wrap');
-  }
-
-
-  function getPrefixClzName(name) {
-    return classPrefix + "-" + name;
-  }
-
-  function createElementWithClz(type, clzName, noPrefix = false) {
-    const key = '' + type + clzName + noPrefix;
-    let cache = elementProto[key];
-    let result;
-
-    if (cache) {
-      result = cache.cloneNode(false);
-    } else {
-      result = createNewElement();
-      elementProto[key] = result;
+    if (line !== '') {
+      // getElementsByClassName is faster than querySelector
+      const codeContent = row.getElementsByClassName(contentClz)[0];
+      codeContent.innerHTML = line + (nextLine ? '\n' : '');
     }
 
-    return result;
-
-    function createNewElement() {
-      const el = document.createElement(type);
-      if (clzName) {
-        clzName = noPrefix ? clzName : getPrefixClzName(clzName);
-        el.classList.add(clzName);
-      }
-      return el;
-    }
+    container.appendChild(row);
   }
 
+  code.innerHTML = '';
+  code.appendChild(container);
+}
 
-  function addPrefixClzToElement(el, clzName) {
-    el.classList.add(getPrefixClzName(clzName));
+function setMaxDigit(wrapper, length) {
+  const clzName = length < 9 ? 'one' :
+    length < 99 ? 'ten' :
+      length < 999 ? 'hundred' : 'thousand';
+
+  domManager.addPrefixClzToElement(wrapper, clzName);
+}
+
+
+function setupWidgets(isMobile, pre, codeWrapper, code) {
+  let self = this;
+
+  setupWidget('copyBtn', CopyBtnFactory);
+  setupWidget('toggleBtn', ToggleBtnFactory);
+
+  function setupWidget(name, factoryClz) {
+    let factory, manipulator;
+    let options = self.options[name];
+
+    if (!options) return;
+
+    let canShow = WidgetManipulator.canShowWidget(isMobile, options);
+
+    if (!canShow) return;
+
+    if (!(factory = widgetFactories[name]))
+      widgetFactories[name] = factory = new factoryClz(domManager);
+    let widget = factory.create();
+    if (!(manipulator = widgetManipulators[name]))
+      widgetManipulators[name] = manipulator = factory.createManipulator();
+    manipulator.setup(isMobile, options, widget, pre, codeWrapper, code);
   }
+}
 
-  function setCodeLength(length, code) {
-    const clzName = length > 999 ? 'over-thousand' : length > 99 ? 'over-hundred' : 'under-hundred';
-    addPrefixClzToElement(code, clzName);
-  }
+function setSoftWrapMode(code) {
+  code.classList.add('soft-wrap');
+}
 
-})();
+export default new CodeLine();
+
+

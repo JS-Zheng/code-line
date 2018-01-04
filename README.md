@@ -14,7 +14,7 @@ Let's demonstrate a "Hello, World!" to you.
 
 (Highlight code by [Highlight.js](https://github.com/isagalaev/highlight.js))
 
-![java-hello-world](demo/java-hello-world.png) 
+![java-hello-world](demo/img/java-hello-world.png)
 
 If you like, keep looking down 😆 or see more [Example](https://js-zheng.github.io/code-line/demo/).
 
@@ -23,13 +23,13 @@ If you like, keep looking down 😆 or see more [Example](https://js-zheng.githu
 
 ## Install
 
-Code-line doesn't rely on any module, just load it!
+### HTML
 
 ```html
 <script src="https://cdn.jsdelivr.net/npm/code-line"></script>
 ```
 
-or use npm:
+### NPM
 
 ```
 npm install code-line
@@ -68,12 +68,12 @@ To disable code-line altogether use the nohighlight class:
 
 We usually have to trace codes with mobile devices. 
 
-<img src="demo/need-to-trace-code.png" alt="need-to-trace-code?.png" width="500px">
+<img src="demo/img/need-to-trace-code.png" alt="need-to-trace-code?.png" width="500px">
 
 Line-numbers.js use `position: absolute` default.  
 As a result, you can slide your screen without losing direction and number.  
 
-<img src="demo/slide%20it.jpg" alt="slide it!" width="500px">
+<img src="demo/img/slide-it.jpg" alt="slide it!" width="500px">
 
 
 If you don't like it, just append your CSS rules, like:
@@ -93,5 +93,36 @@ If you want to use `Soft Wrap`, append `soft-wrap` class to your `<code>`:
 <pre><code class="soft-wrap">...</code></pre>
 ```
 
+### Widget
+
+Currently, CodeLine supports two widgets -- **ToggleButtonFactory** & **LineNumbersToggle**.
+
+<img src="demo/img/two-widgets.png" alt="two-widgets.png" width="500px">
+
+It may be useful or annoying, you can enable/disable it whatever you love.
+
+---
+
+### Options
 
 
+| Name             | Type      | Default                                                                           | Description                                                   |
+|------------------|-----------|-----------------------------------------------------------------------------------|---------------------------------------------------------------|
+| `minLine`        | {Number}  | 3                                                                                 | Code below `minLine` will not be applied                      |
+| `show`           | {Boolean} | true                                                                              | Enable/Disable Line Numbers                                   |
+| `showOnMobile`   | {Boolean} | false                                                                             | Enable/Disable Line Numbers on mobile                         |
+| `softWrap`       | {Boolean} | false                                                                             | Enable/Disable softwrap                                       |
+| `maxMobileWidth` | {Number}  | 420                                                                               | Width below the `maxMobileWidth` will be considered as mobile |
+| `copyBtn`        | {Object}  | {show: true, position: 'bottom', showOnMobile: false, positionOnMobile: 'bottom'} | The setting of the `Copy Button`                              |
+| `toggleBtn`      | {Object}  | {show: true, position: 'top', showOnMobile: true, positionOnMobile: 'top'}        | The setting of the `Line Numbers Toggle Button`               |
+
+Example:
+```html
+<script>
+  CodeLine.initOnPageLoad({
+    showOnMobile: true,
+    toggleBtn: {show: true, showOnMobile: false, position: 'bottom'}
+  })
+</script>
+</script>
+```
