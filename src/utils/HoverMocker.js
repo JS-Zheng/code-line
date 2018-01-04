@@ -1,4 +1,4 @@
-export default function HoverMocker(elements, clzName, mouseLeaveTime = 0, touchLeaveTime = 1000) {
+function HoverMocker(elements, clzName, mouseLeaveTime = 0, touchLeaveTime = 1000) {
   const self = this;
   this.startCall = null;
   this.endCall = null;
@@ -39,7 +39,7 @@ export default function HoverMocker(elements, clzName, mouseLeaveTime = 0, touch
       }
 
     }, cancelTime);
-    
+
   };
 
   if (isIterable(elements)) {
@@ -75,3 +75,4 @@ HoverMocker.prototype.onEnd = function (call) {
   this.endCall = call;
 };
 
+export default HoverMocker;

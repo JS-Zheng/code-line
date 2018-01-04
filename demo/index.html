@@ -1,27 +1,22 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
-    <title>Code-Line Demo</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
-    <script src='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js'></script>
-    <script>hljs.initHighlightingOnLoad();</script>
-    <style>
-        html, body {
-            margin: 0;
-            padding: 10px;
-            background-color: #eee;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Code-Line Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js'></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 10px;
+      background-color: #eee;
+    }
+  </style>
 
-    <script src="../dist/code-line.js"></script>
-    <script>
-      CodeLine.initOnPageLoad({
-        showOnMobile: true,
-        toggleBtn: {show: true, showOnMobile: false, position: 'bottom'}
-      })
-    </script>
+  <script src="../dist/code-line.js"></script>
+  <script>CodeLine.initOnPageLoad()</script>
 </head>
 
 <body>
@@ -33,7 +28,7 @@
 <hr>
 <h2>nohighlight</h2>
 <pre style="border: 1px solid #222; padding: 10px;"><code class="nohighlight">HTTP-message   = <span
-      style="color: #2196F3;">start-line</span>
+    style="color: #2196F3;">start-line</span>
                  <span style="color: #009688;">*( header-field CRLF )</span>
                  <span style="color: #FFC107;">CRLF</span>
                  <span style="color: #E91E63;">[ message-body ]</span></code></pre>

@@ -4,6 +4,10 @@ $prefix: cljs;
   text-shadow: 0 (-$width) $color, $width 0 $color, 0 $width $color, (-$width) 0 $color;
 }
 
+pre, pre.#{$prefix} {
+  overflow: visible;
+}
+
 pre {
 
   .#{$prefix}-wrapper {
@@ -63,7 +67,7 @@ pre {
   &.#{$prefix} {
 
     $code-line-height: 1.45;
-    $basicNumberWidth: 1.55em;
+    $basicNumberWidth: 1.6em;
 
     code {
       overflow-wrap: normal;
@@ -130,7 +134,7 @@ pre {
     }
 
     @each $digit, $width in (one:$basicNumberWidth, ten:$basicNumberWidth+0.6,
-            hundred:$basicNumberWidth+1.2, thousand:$basicNumberWidth+1.8) {
+        hundred:$basicNumberWidth+1.2, thousand:$basicNumberWidth+1.8) {
       // class chain
       .#{$prefix}-wrapper.#{$prefix}-#{$digit} {
 

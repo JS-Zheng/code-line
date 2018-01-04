@@ -1,63 +1,72 @@
 import './styles/code-line.scss'
 import whenReady from './utils/whenReady'
-import Clipboard from 'clipboard'
-import HoverMocker from './utils/HoverMocker'
+import DomManager from './utils/DomManager'
+import CodeRowFactory from './components/factory/CodeRowFactory'
+import WidgetManipulator from './components/manipulator/WidgetManipulator';
+import ToggleBtnFactory from './components/factory/ToggleBtnFactory';
+import CopyBtnFactory from './components/factory/CopyBtnFactory';
 
 let env = process.env;
-console.log(`==== ${env.NAME} ${env.NODE_ENV} v${env.VERSION} ====`);
+if (env.NODE_ENV !== 'production')
+  console.log(`==== ${env.NAME} ${env.NODE_ENV} v${env.VERSION} ====`);
 
 const classPrefix = 'cljs';
 const numClickEventName = '$_' + classPrefix + 'NumClickEvent';
+const domManager = new DomManager(classPrefix);
+const codeRowFactory = new CodeRowFactory(domManager, numClickEventName);
 
-let elementProto = {};
-
-function getElementPrototype(key) {
-  return elementProto[key];
-}
-
-function setElementPrototype(key, element) {
-  elementProto[key] = element;
-}
+let widgetFactories = {};
+let widgetManipulators = {};
 
 function CodeLine() {
   const self = this;
+  this.options = {};
 
-  // Default Options
-  this.minLine = 3;
-  this.show = true;
-  this.softWrap = false;
-  this.showOnMobile = false;
-  this.maxMobileWidth = 420;
-
-  this.copyBtn = {
+  let defaultOptions = {
+    minLine: 3,
     show: true,
-    showOnMobile: true,
-    position: 'top'
-  };
+    softWrap: false,
+    showOnMobile: false,
+    maxMobileWidth: 420,
 
-  this.toggleBtn = {
-    show: true,
-    showOnMobile: true,
-    position: 'bottom'
+    // Widgets Options
+    copyBtn: {
+      show: true,
+      position: 'bottom',
+      showOnMobile: false,
+      positionOnMobile: 'bottom'
+    },
+
+    toggleBtn: {
+      show: true,
+      position: 'top',
+      showOnMobile: true,
+      positionOnMobile: 'top'
+    }
   };
 
   this.loadLineNumbers = function (options = {}) {
-    Object.assign(self, options);
+    resolveOptions.call(self, defaultOptions, options);
 
-    let codes = document.querySelectorAll("pre > code");
+    let codes = document.querySelectorAll('pre code');
     const deviceWidth = getDeviceWidth();
 
     // for Performance is faster than Array#forEach:
     for (let i = 0, code; code = codes[i]; i++) {
-      const pre = code.parentNode;
+      let pre = code.parentNode;
+      if (pre.tagName !== 'PRE') {
+        do {
+          pre = pre.parentNode;
+        } while (pre.tagName !== 'PRE')
+      }
 
-      if (code.matches(".nohighlight")) continue;
+      if (code.matches('.nohighlight')) continue;
 
       let lines = getLines(code);
-      if (!lines || lines.length < self.minLine) continue;
+      if (!lines || lines.length < self.options.minLine) continue;
 
-      let isMobile = deviceWidth <= self.maxMobileWidth;
-      if ((isMobile && self.showOnMobile) || (!isMobile && self.show))
+      let isMobile = deviceWidth <= self.options.maxMobileWidth;
+      if ((isMobile && self.options.showOnMobile) || (!isMobile && self.options.show))
         pre.classList.add(classPrefix);
 
       let codeWrapper = appendCodeWrapper(pre, code);
@@ -68,30 +77,34 @@ function CodeLine() {
 
       setupWidgets.call(self, isMobile, pre, codeWrapper, code);
 
-      if (self.softWrap)
+      if (self.options.softWrap)
         setSoftWrapMode(code);
 
     } // for End
 
-    setGlobalNumClickEvent();
-
-    function setGlobalNumClickEvent() {
+    (function setGlobalNumClickEvent() {
       let highlightClz = classPrefix + '-' + 'highlight';
       window[numClickEventName] = function (e) {
         let content = e.target.nextSibling;
         if (!content) return;
         content.classList.toggle(highlightClz)
       };
-    }
+    })();
 
     // free
-    elementProto = {};
+    domManager.clearPrototype();
   };
 
   this.initOnPageLoad = function (options = {}) {
-    let bindOptionsFunction = this.loadLineNumbers.bind(this, options);
+    let bindOptionsFunction = self.loadLineNumbers.bind(self, options);
     whenReady(bindOptionsFunction);
   }
+}
+
+function resolveOptions(defaultOptions, options) {
+  let mergedCopyBtn = Object.assign({}, defaultOptions.copyBtn, options.copyBtn);
+  let mergedToggleBtn = Object.assign({}, defaultOptions.toggleBtn, options.toggleBtn);
+  Object.assign(this.options, defaultOptions, options, {copyBtn: mergedCopyBtn, toggleBtn: mergedToggleBtn});
 }
 
 function getDeviceWidth() {
@@ -105,20 +118,20 @@ function getLines(code) {
 }
 
 function appendCodeWrapper(pre, code) {
-  let codeWrapper = createElementWithClz('div', 'wrapper');
+  let codeWrapper = domManager.createElementWithClz('div', 'wrapper');
   pre.appendChild(codeWrapper);
   codeWrapper.appendChild(code);
   return codeWrapper;
 }
 
 function splitCodeLayout(code, lines) {
-  const container = createElementWithClz("div", "container");
-  const contentClz = getPrefixClzName('content');
+  const container = domManager.createElementWithClz('div', 'container');
+  const contentClz = domManager.getPrefixClzName('content');
 
   for (let i = 0, line, nextLine = lines[0]; (line = nextLine ) || line === ''; i++) {
     nextLine = lines[i + 1];
 
-    const row = createRow();
+    const row = codeRowFactory.create();
 
     if (line !== '') {
       // getElementsByClassName is faster than querySelector
@@ -129,29 +142,8 @@ function splitCodeLayout(code, lines) {
     container.appendChild(row);
   }
 
-  code.innerHTML = "";
+  code.innerHTML = '';
   code.appendChild(container);
-
-  function createRow() {
-    // use inline event attribute instead of addEventListener
-    // to prevent DOM manipulating (e.g., Node Replace) by other script.
-    const key = 'rowPrototype';
-    let proto = getElementPrototype(key);
-
-    if (!proto) {
-      proto = createElementWithClz('div', 'row');
-      const num = createElementWithClz('div', 'number');
-      const codeContent = createElementWithClz("div", "content");
-      codeContent.innerHTML = '\n'; // Prepare for empty content
-      num.setAttribute('onclick', `${numClickEventName}(event)`);
-      proto.appendChild(num);
-      proto.appendChild(codeContent);
-
-      setElementPrototype(key, proto);
-    }
-
-    return proto.cloneNode(true);
-  }
 }
 
 function setMaxDigit(wrapper, length) {
@@ -159,144 +151,38 @@ function setMaxDigit(wrapper, length) {
     length < 99 ? 'ten' :
       length < 999 ? 'hundred' : 'thousand';
 
-  addPrefixClzToElement(wrapper, clzName);
+  domManager.addPrefixClzToElement(wrapper, clzName);
 }
+
 
 function setupWidgets(isMobile, pre, codeWrapper, code) {
-  // Reserved for use state pattern
-  let showCopyBtn = showWidget(isMobile, this.copyBtn);
-  let showToggleBtn = showWidget(isMobile, this.toggleBtn);
+  let self = this;
 
-  if (showCopyBtn) {
-    let btnCopy = createCopyBtn();
-    setupBtnCopy(btnCopy, codeWrapper, this.copyBtn.position, code);
+  setupWidget('copyBtn', CopyBtnFactory);
+  setupWidget('toggleBtn', ToggleBtnFactory);
+
+  function setupWidget(name, factoryClz) {
+    let factory, manipulator;
+    let options = self.options[name];
+
+    if (!options) return;
+
+    let canShow = WidgetManipulator.canShowWidget(isMobile, options);
+
+    if (!canShow) return;
+
+    if (!(factory = widgetFactories[name]))
+      widgetFactories[name] = factory = new factoryClz(domManager);
+    let widget = factory.create();
+    if (!(manipulator = widgetManipulators[name]))
+      widgetManipulators[name] = manipulator = factory.createManipulator();
+    manipulator.setup(isMobile, options, widget, pre, codeWrapper, code);
   }
-
-  if (showToggleBtn) {
-    let btnToggle = createToggleBtn();
-    setupToggleButton(btnToggle, codeWrapper, this.toggleBtn.position, pre);
-  }
-}
-
-function showWidget(isMobile, widgetOptions) {
-  if (isMobile && widgetOptions.showOnMobile)
-    return true;
-  else return !!(!isMobile && widgetOptions.show);
 }
 
 function setSoftWrapMode(code) {
   code.classList.add('soft-wrap');
 }
-
-function createCopyBtn() {
-  const key = 'copyButtonPrototype';
-  let proto = getElementPrototype(key);
-
-  if (!proto) {
-    proto = createElementWithClz('button', 'copy-btn');
-    proto.textContent = 'Copy';
-    proto.setAttribute('data-tooltip-text', 'Copy to clipboard');
-
-    setElementPrototype(key, proto);
-  }
-
-  return proto.cloneNode(true);
-}
-
-function createToggleBtn() {
-  return createElementWithClz('div', 'toggle-btn');
-}
-
-function setupBtnCopy(btnCopy, codeWrapper, position, code) {
-  const copyBtnTouchClz = getPrefixClzName("copy-btn-hover");
-  let hintText = 'Copy to clipboard';
-  let hover = new HoverMocker(btnCopy, copyBtnTouchClz);
-  hover.onStart(restoreHintText);
-
-  codeWrapper.appendChild(btnCopy);
-  setWidgetPosition(btnCopy, position);
-
-  let clipboard = new Clipboard(btnCopy, {
-    target: function () {
-      return code;
-    }
-  });
-
-  clipboard.on('success', function (e) {
-    let btn = e.trigger;
-    btn.setAttribute('data-tooltip-text', 'Copied!');
-    e.clearSelection();
-  });
-
-  clipboard.on('error', function (e) {
-    let btn = e.trigger;
-    hintText = 'No support ☹️';
-    btn.setAttribute('data-tooltip-text', hintText);
-  });
-
-  return clipboard;
-
-  function restoreHintText(e) {
-    e.target.setAttribute('data-tooltip-text', hintText);
-  }
-}
-
-function setupToggleButton(btn, codeWrapper, position, pre) {
-
-  btn.addEventListener("click", () => pre.classList.toggle(classPrefix));
-
-  const toggleBtnTouchClz = getPrefixClzName("toggle-btn-hover");
-
-  let hover = new HoverMocker(pre);
-
-  hover.onStart(() => {
-    btn.classList.add(toggleBtnTouchClz)
-  });
-
-  hover.onEnd(() => {
-    btn.classList.remove(toggleBtnTouchClz)
-  });
-
-  codeWrapper.appendChild(btn);
-  setWidgetPosition(btn, position);
-}
-
-function getPrefixClzName(name) {
-  return classPrefix + "-" + name;
-}
-
-function createElementWithClz(type, clzName, noPrefix = false) {
-  const key = '' + type + clzName + noPrefix;
-  let proto = getElementPrototype(key);
-
-  if (!proto) {
-    proto = createNewElement();
-    setElementPrototype(key, proto);
-  }
-
-  return proto.cloneNode(false);
-
-  function createNewElement() {
-    const el = document.createElement(type);
-    if (clzName) {
-      clzName = noPrefix ? clzName : getPrefixClzName(clzName);
-      el.classList.add(clzName);
-    }
-    return el;
-  }
-}
-
-function addPrefixClzToElement(el, clzName) {
-  el.classList.add(getPrefixClzName(clzName));
-}
-
-function setWidgetPosition(widget, position) {
-  if (position === 'top')
-    addPrefixClzToElement(widget, 'top-right-widget');
-  else
-    addPrefixClzToElement(widget, 'bottom-right-widget');
-}
-
 
 export default new CodeLine();
 
