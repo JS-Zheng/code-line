@@ -124,5 +124,4 @@ Example:
     toggleBtn: {show: true, showOnMobile: false, position: 'bottom'}
   })
 </script>
-</script>
 ```
