@@ -49,7 +49,6 @@ The only thing you need to do is:
 ### Choose the loading time
 If you want to customize the loading time:
 
-EX:
 ```javascript
 // May be event-triggered or below the html body
 CodeLine.loadLineNumbers()
@@ -57,8 +56,7 @@ CodeLine.loadLineNumbers()
 
 ### Nohighlight
 
-Same as the [Highlight.js](https://github.com/isagalaev/highlight.js).  
-To disable code-line altogether use the nohighlight class:
+Same as the [Highlight.js](https://github.com/isagalaev/highlight.js), to disable code-line altogether use the `nohighlight` class:
 
 ```html
 <pre><code class="nohighlight">...</code></pre>
@@ -66,12 +64,12 @@ To disable code-line altogether use the nohighlight class:
 
 ### Absolute Position
 
-We usually have to trace codes with mobile devices. 
+We usually have to trace codes with mobile devices.
 
 <img src="demo/img/need-to-trace-code.png" alt="need-to-trace-code?.png" width="500px">
 
-Line-numbers.js use `position: absolute` default.  
-As a result, you can slide your screen without losing direction and number.  
+Line-numbers.js use `position: absolute` default.
+As a result, you can slide your screen without losing direction and number.
 
 <img src="demo/img/slide-it.png" alt="slide it!" width="400px">
 
@@ -81,13 +79,13 @@ If you don't like it, just append your CSS rules, like:
 ```css
 pre.cljs code {
   position: relative;
-}  
+}
 ```
 
 ### Soft Wrap
 
 `Hard Wrap` is the default setting of Code-line.
-If you want to use `Soft Wrap`, append `soft-wrap` class to your `<code>`:  
+If you want to use `Soft Wrap`, append `soft-wrap` class to your `<code>`:
 
 ```html
 <pre><code class="soft-wrap">...</code></pre>
@@ -95,7 +93,7 @@ If you want to use `Soft Wrap`, append `soft-wrap` class to your `<code>`:
 
 ### Widget
 
-Currently, CodeLine supports two widgets -- **ToggleButtonFactory** & **LineNumbersToggle**.
+Currently, CodeLine supports two widgets -- **CopyButton** & **LineNumbersToggle**.
 
 <img src="demo/img/two-widgets.png" alt="two-widgets.png" width="500px">
 
