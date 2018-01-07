@@ -7,16 +7,21 @@ class ToggleBtnManipulator extends WidgetManipulator {
 ToggleBtnManipulator.prototype.setup = function (isMobile, options, toggleBtn, pre, codeWrapper) {
   toggleBtn.addEventListener("click", () => pre.classList.toggle(this.domManager.classPrefix));
 
-  const toggleBtnTouchClz = this.domManager.getPrefixClzName("toggle-btn-hover");
+  const toggleBtnHoverClz = this.domManager.getPrefixClzName("toggle-btn-hover");
+  const toggleBtnShowClz = this.domManager.getPrefixClzName("toggle-btn-show");
 
-  let hover = new HoverMocker(pre);
+  // setup btn
+  let toggleBtnHover = new HoverMocker(toggleBtn, toggleBtnHoverClz);
 
-  hover.onStart(() => {
-    toggleBtn.classList.add(toggleBtnTouchClz)
+  // setup pre
+  let preHover = new HoverMocker(pre);
+
+  preHover.onStart(() => {
+    toggleBtn.classList.add(toggleBtnShowClz)
   });
 
-  hover.onEnd(() => {
-    toggleBtn.classList.remove(toggleBtnTouchClz)
+  preHover.onEnd(() => {
+    toggleBtn.classList.remove(toggleBtnShowClz)
   });
 
   codeWrapper.appendChild(toggleBtn);

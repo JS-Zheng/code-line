@@ -7,7 +7,8 @@ import ToggleBtnFactory from './components/factory/ToggleBtnFactory';
 import CopyBtnFactory from './components/factory/CopyBtnFactory';
 
 let env = process.env;
-if (env.NODE_ENV !== 'production')
+const isProduction = env.NODE_ENV === 'production';
+if (!isProduction)
   console.log(`==== ${env.NAME} ${env.NODE_ENV} v${env.VERSION} ====`);
 
 const classPrefix = 'cljs';
@@ -45,7 +46,7 @@ function CodeLine() {
     }
   };
 
-  this.loadLineNumbers = function (options = {}) {
+  this.load = function (options = {}) {
     resolveOptions.call(self, defaultOptions, options);
 
     let codes = document.querySelectorAll('pre code');
@@ -96,7 +97,7 @@ function CodeLine() {
   };
 
   this.initOnPageLoad = function (options = {}) {
-    let bindOptionsFunction = self.loadLineNumbers.bind(self, options);
+    let bindOptionsFunction = self.load.bind(self, options);
     whenReady(bindOptionsFunction);
   }
 }
