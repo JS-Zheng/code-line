@@ -1,14 +1,29 @@
 $prefix: cljs;
+$rowColorTransitionTime: .3s;
+$code-line-height: 1.45;
+$basicNumberWidth: 1.6em;
 
 @mixin text-border($width,$color) {
   text-shadow: 0 (-$width) $color, $width 0 $color, 0 $width $color, (-$width) 0 $color;
 }
 
-pre, pre.#{$prefix} {
+@mixin tooltip-arrow($arrow-width) {
+  border-width: $arrow-width;
+  border-style: solid;
+  border-color: rgba(40, 40, 40, .9) transparent transparent transparent;
+}
+
+// prism.js trade-off
+pre, pre.#{$prefix}, pre[class*="language-"] {
   overflow: visible;
 }
 
 pre {
+
+  code {
+    display: block;
+    overflow-x: auto;
+  }
 
   .#{$prefix}-wrapper {
     position: relative
@@ -24,13 +39,11 @@ pre {
   }
 
   .#{$prefix}-content {
-    transition: {
-      property: margin-left;
-      duration: .35s
-    }
+    white-space: pre;
+    transition: margin-left .35s, color $rowColorTransitionTime;
 
     * {
-      transition: color .5s
+      transition: color $rowColorTransitionTime
     }
   }
 
@@ -39,6 +52,8 @@ pre {
     opacity: 0;
     padding: 2px;
     border-radius: 25%;
+    box-shadow: 2px 2px 2px #282828;
+
     transition: {
       property: opacity;
       duration: .35s
@@ -52,23 +67,19 @@ pre {
       background: url(../img/numbered-list.svg) no-repeat;
       background-size: contain
     }
-
-    &:hover {
-      //transition: initial;
-      transform: translate(-2px, -2px)
-    }
   }
 
   .#{$prefix}-toggle-btn-hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 2px 2px 5px #282828;
+  }
+
+  .#{$prefix}-toggle-btn-show {
     opacity: .5
   }
 
   // Code-Line.js Enabled
   &.#{$prefix} {
-
-    $code-line-height: 1.45;
-    $basicNumberWidth: 1.6em;
-
     code {
       overflow-wrap: normal;
       word-wrap: normal;
@@ -76,6 +87,7 @@ pre {
       white-space: pre;
       overflow-x: auto;
       display: block;
+      padding-left: .5em;
       line-height: $code-line-height;
       counter-reset: linenumber;
       text-size-adjust: 100%;
@@ -85,11 +97,13 @@ pre {
     .#{$prefix}-highlight {
       background-color: #ef9a9a;
       filter: contrast(120%);
+      transition: text-shadow $rowColorTransitionTime;
       @include text-border(.5px, black);
       color: #fff
     }
 
     .#{$prefix}-number {
+      color: #999;
       position: absolute;
       left: 0; // Prevent padding from <code>
       text-align: right;
@@ -101,7 +115,8 @@ pre {
       z-index: 10;
 
       &:hover {
-        filter: brightness(200%)
+        @include text-border(.5px, black);
+        filter: brightness(170%)
       }
 
       &::before {
@@ -165,6 +180,10 @@ pre {
     transition: background .5s;
     background-color: transparent;
 
+    &::-moz-focus-inner {
+      border: 0;
+    }
+
     &.#{$prefix}-copy-btn-hover {
       color: white;
       background-color: #2196F3;
@@ -199,26 +218,20 @@ pre {
       top: -$tooltip-levitation-height;
       left: 50%;
       margin-left: -($tooltip-arrow-width);
-      border-width: $tooltip-arrow-width;
-      border-style: solid;
-      border-color: rgba(40, 40, 40, .9) transparent transparent transparent;
+      @include tooltip-arrow($tooltip-arrow-width);
     }
   }
 
   .#{$prefix}-top-right-widget {
     position: absolute;
     top: .65em;
-    right: .65em;
+    right: 1.5em;
   }
 
   .#{$prefix}-bottom-right-widget {
     position: absolute;
     bottom: 1em;
-    right: .65em;
+    right: 1.5em;
   }
 
 }
-
-
-
-

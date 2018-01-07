@@ -50,8 +50,8 @@ The only thing you need to do is:
 If you want to customize the loading time:
 
 ```javascript
-// May be event-triggered or below the html body
-CodeLine.loadLineNumbers()
+// Maybe event-triggered or <script> below the html body
+CodeLine.load()
 ```
 
 ### Nohighlight
