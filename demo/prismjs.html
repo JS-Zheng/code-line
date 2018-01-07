@@ -6,7 +6,6 @@
   <link rel="stylesheet" href="style/prism.css">
   <script src="lib/prism.js"></script>
   <script src="../dist/code-line.js"></script>
-  <!--<script>CodeLine.initOnPageLoad()</script>-->
 </head>
 <body>
 <pre><code class="language-java">public class Main {
@@ -21,6 +20,6 @@
 // Hello, World!</code></pre>
 
 
-<script>setTimeout(CodeLine.load, 10)</script>
+<script>Prism.hooks.add('complete', CodeLine.load);</script>
 </body>
 </html>

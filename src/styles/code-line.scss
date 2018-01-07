@@ -50,11 +50,12 @@ pre {
 
   .#{$prefix}-toggle-btn {
     background-color: #fff;
-    width: 25px;
-    height: 25px;
+    width: 27px;
+    height: 27px;
     opacity: 0;
     padding: 2px;
     border-radius: 25%;
+    display: grid;
     box-shadow: 2px 2px 2px $shadowColor;
 
     transition: {
@@ -65,6 +66,7 @@ pre {
     &::after {
       content: "";
       display: inline-block;
+      margin: auto;
       width: 25px;
       height: 25px;
       background: url(../img/numbered-list.svg) no-repeat;
@@ -228,13 +230,13 @@ pre {
   .#{$prefix}-top-right-widget {
     position: absolute;
     top: .65em;
-    right: 1.5em;
+    right: 1.3em;
   }
 
   .#{$prefix}-bottom-right-widget {
     position: absolute;
     bottom: 1em;
-    right: 1.5em;
+    right: 1.3em;
   }
 
 }

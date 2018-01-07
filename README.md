@@ -2,7 +2,7 @@
 
 Code-line.js is a lightweight plugin, it finds every `<pre><code>...` in your page, and append line numbers. Most of the features are dependent on CSS to complete, so very flexible & efficient.
 
-It's mainly use with [Highlight.js](https://github.com/isagalaev/highlight.js), but you can also render your code in any way.  
+It's mainly use with [Highlight.js](https://github.com/isagalaev/highlight.js) or [Prism](http://prismjs.com/), but you can also render your code in any way.
 
 [GitHub Pages](https://js-zheng.github.io/code-line/)
 
@@ -54,8 +54,9 @@ If you want to customize the loading time:
 CodeLine.load()
 ```
 
-> If you use [Prism](http://prismjs.com/) as a syntax-highlighter, CodeLine needs to `load()` **after** it.
-> You can achieve this easily with some hacks, ex: `setTimeout(CodeLine.load, 10)`
+important:
+> If you use [Prism](http://prismjs.com/) as a syntax-highlighter, CodeLine needs to be `load()` **after** it.
+> Ex: `Prism.hooks.add('complete', CodeLine.load)`
 
 ### Nohighlight
 
