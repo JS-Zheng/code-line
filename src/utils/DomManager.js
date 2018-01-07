@@ -13,7 +13,7 @@ DomManager.prototype = {
     this.elementProto[isComponent + key] = element;
   },
   clearPrototype: function () {
-    this.elementProto = null;
+    this.elementProto = {};
   },
   createElementWithClz: function (type, clzName = null, noPrefix = false) {
     const key = '' + type + clzName + noPrefix;
