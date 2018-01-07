@@ -1,7 +1,8 @@
 $prefix: cljs;
-$rowColorTransitionTime: .3s;
+$rowColorTransitionTime: .2s;
 $code-line-height: 1.45;
 $basicNumberWidth: 1.6em;
+$shadowColor: #323232;
 
 @mixin text-border($width,$color) {
   text-shadow: 0 (-$width) $color, $width 0 $color, 0 $width $color, (-$width) 0 $color;
@@ -10,11 +11,11 @@ $basicNumberWidth: 1.6em;
 @mixin tooltip-arrow($arrow-width) {
   border-width: $arrow-width;
   border-style: solid;
-  border-color: rgba(40, 40, 40, .9) transparent transparent transparent;
+  border-color: rgba(50, 50, 50, .9) transparent transparent transparent;
 }
 
 // prism.js trade-off
-pre, pre.#{$prefix}, pre[class*="language-"] {
+pre, pre.#{$prefix}, pre[class*="language-"], pre.#{$prefix}[class*="language-"] {
   overflow: visible;
 }
 
@@ -49,10 +50,12 @@ pre {
 
   .#{$prefix}-toggle-btn {
     background-color: #fff;
+    width: 25px;
+    height: 25px;
     opacity: 0;
     padding: 2px;
     border-radius: 25%;
-    box-shadow: 2px 2px 2px #282828;
+    box-shadow: 2px 2px 2px $shadowColor;
 
     transition: {
       property: opacity;
@@ -71,7 +74,7 @@ pre {
 
   .#{$prefix}-toggle-btn-hover {
     transform: translate(-2px, -2px);
-    box-shadow: 2px 2px 5px #282828;
+    box-shadow: 2px 2px 5px $shadowColor;
   }
 
   .#{$prefix}-toggle-btn-show {
@@ -98,7 +101,7 @@ pre {
       background-color: #ef9a9a;
       filter: contrast(120%);
       transition: text-shadow $rowColorTransitionTime;
-      @include text-border(.5px, black);
+      @include text-border(.5px, $shadowColor);
       color: #fff
     }
 
@@ -115,7 +118,7 @@ pre {
       z-index: 10;
 
       &:hover {
-        @include text-border(.5px, black);
+        text-shadow: 1px 1px $shadowColor;
         filter: brightness(170%)
       }
 
@@ -203,7 +206,7 @@ pre {
     &::before {
       content: attr(data-tooltip-text);
       padding: 5px 8px;
-      background-color: rgba(40, 40, 40, .9);
+      background-color: rgba(50, 50, 50, .9);
       color: white;
       text-align: center;
       border-radius: 6px;

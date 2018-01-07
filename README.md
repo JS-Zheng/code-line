@@ -54,6 +54,9 @@ If you want to customize the loading time:
 CodeLine.load()
 ```
 
+> If you use [Prism](http://prismjs.com/) as a syntax-highlighter, CodeLine needs to `load()` **after** it.
+> You can achieve this easily with some hacks, ex: `setTimeout(CodeLine.load, 10)`
+
 ### Nohighlight
 
 Same as the [Highlight.js](https://github.com/isagalaev/highlight.js), to disable code-line altogether use the `nohighlight` class:
