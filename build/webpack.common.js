@@ -1,3 +1,4 @@
+const webpack = require('webpack');
 const path = require('path');
 
 module.exports = {
@@ -20,15 +21,21 @@ module.exports = {
     path: path.resolve(__dirname, '../dist'),
     library: 'CodeLine',
     libraryTarget: "umd",
-    libraryExport: 'default'
+    libraryExport: 'default',
+    clean: {
+      keep: 'code-line.esm.js',
+    },
   },
   module: {
     rules: [
       {
         test: /\.js$/,
-        exclude: /node_modules/,
+        exclude: /(node_modules|bower_components)/,
         use: {
-          loader: 'babel-loader'
+          loader: 'babel-loader',
+          options: {
+            presets: ['@babel/preset-env']
+          }
         }
       },
       {
@@ -44,10 +51,8 @@ module.exports = {
       },
       {
         test: /\.(png|svg|jpg|gif)$/,
-        use: [
-          'url-loader'
-        ]
+        type: 'asset/inline'
       }
     ]
-  }
+  },
 };

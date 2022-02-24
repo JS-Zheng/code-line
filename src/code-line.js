@@ -6,10 +6,9 @@ import WidgetManipulator from './components/manipulator/WidgetManipulator';
 import ToggleBtnFactory from './components/factory/ToggleBtnFactory';
 import CopyBtnFactory from './components/factory/CopyBtnFactory';
 
-let env = process.env;
-const isProduction = env.NODE_ENV === 'production';
+const isProduction = ENV === 'production';
 if (!isProduction)
-  console.log(`==== ${env.NAME} ${env.NODE_ENV} v${env.VERSION} ====`);
+  console.log(`==== ${NAME} ${ENV} v${VERSION} ====`);
 
 const classPrefix = 'cljs';
 const numClickEventName = '$_' + classPrefix + 'NumClickEvent';
@@ -30,7 +29,7 @@ function CodeLine() {
     showOnMobile: false,
     maxMobileWidth: 420,
 
-    // Widgets Options
+    // Widget Options
     copyBtn: {
       show: true,
       position: 'bottom',
@@ -39,7 +38,7 @@ function CodeLine() {
     },
 
     toggleBtn: {
-      show: true,
+      show: false,
       position: 'top',
       showOnMobile: true,
       positionOnMobile: 'top'
@@ -52,8 +51,7 @@ function CodeLine() {
     let codes = document.querySelectorAll('pre code');
     const deviceWidth = getDeviceWidth();
 
-    // for Performance is faster than Array#forEach:
-    for (let i = 0, code; code = codes[i]; i++) {
+    for (let i = 0, code; (code = codes[i]); i++) {
       let pre = code.parentNode;
       if (pre.tagName !== 'PRE') {
         do {
@@ -61,10 +59,12 @@ function CodeLine() {
         } while (pre.tagName !== 'PRE')
       }
 
-      if (code.matches('.nohighlight')) continue;
+      if (code.matches('.nohighlight'))
+        continue;
 
       let lines = getLines(code);
-      if (!lines || lines.length < self.options.minLine) continue;
+      if (!lines || lines.length < self.options.minLine)
+        continue;
 
       let isMobile = deviceWidth <= self.options.maxMobileWidth;
       if ((isMobile && self.options.showOnMobile) || (!isMobile && self.options.show))
@@ -129,7 +129,7 @@ function splitCodeLayout(code, lines) {
   const container = domManager.createElementWithClz('div', 'container');
   const contentClz = domManager.getPrefixClzName('content');
 
-  for (let i = 0, line, nextLine = lines[0]; (line = nextLine ) || line === ''; i++) {
+  for (let i = 0, line, nextLine = lines[0]; (line = nextLine) || line === ''; i++) {
     nextLine = lines[i + 1];
 
     const row = codeRowFactory.create();
